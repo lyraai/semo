@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../redux/store';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../App';
+import { sendQuestionnaireData } from '../service/api';
 
 type FinalScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'FinalScreen'>;
 
@@ -14,9 +15,13 @@ type Props = {
 export default function QuestionFinalScreen({ navigation }: Props) {
   const questionnaireData = useSelector((state: RootState) => state.questionnaire);
 
-  const handleStartChat = () => {
-    // 这里可以处理发送数据到后端的逻辑，或者直接开始对话
-    // navigation.navigate('ChatScreen'); // 假设有一个聊天页面
+  const handleStartChat = async () => {
+    try {
+      await sendQuestionnaireData(questionnaireData);
+      navigation.navigate('ChatScreen');
+    } catch (error) {
+      console.error('Failed to start AI chat:', error);
+    }
   };
 
   return (
@@ -28,7 +33,6 @@ export default function QuestionFinalScreen({ navigation }: Props) {
       <Text style={styles.text}>分开时长: {questionnaireData.breakupDuration}</Text>
       <Text style={styles.text}>当前感受: {questionnaireData.currentEmotion}</Text>
       <Text style={styles.text}>想要的结果: {questionnaireData.desiredOutcome}</Text>
-      
       <Button title="开始AI对话" onPress={handleStartChat} />
     </View>
   );

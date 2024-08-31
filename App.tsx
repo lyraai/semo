@@ -1,3 +1,4 @@
+// /Users/bailangcheng/Desktop/semo/App.tsx
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -9,7 +10,7 @@ import Question2Screen from './screens/Question2Screen';
 import Question3Screen from './screens/Question3Screen';
 import Question4Screen from './screens/Question4Screen';
 import QuestionFinalScreen from './screens/QuestionFinalScreen';
-import ChatScreen from 'screens/ChatScreen';
+import ChatScreen from './screens/ChatScreen';
 
 const Stack = createStackNavigator();
 
