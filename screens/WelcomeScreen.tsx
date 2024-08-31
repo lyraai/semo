@@ -18,7 +18,7 @@ export default function WelcomeScreen({ navigation }: Props) {
       <Text style={styles.subtitle}>你的情绪急救助手</Text>
       <Button
         title="下一步"
-        onPress={() => navigation.navigate('Question1')}
+        onPress={() => navigation.navigate('Question0')}
         color="#f06262"
       />
     </View>

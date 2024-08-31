@@ -1,23 +1,24 @@
-// my-semo-app/redux/slices/questionnaireSlice.ts
+// /Users/bailangcheng/Desktop/semo/redux/slices/questionnaireSlice.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-// 定义 QuestionnaireData 接口
 export interface QuestionnaireData {
   relationshipStatus: string;
   breakupDuration: string;
   currentEmotion: string;
   desiredOutcome: string;
+  age: string;    // 新增的字段
+  gender: string; // 新增的字段
 }
 
-// 初始化状态
 const initialState: QuestionnaireData = {
   relationshipStatus: '',
   breakupDuration: '',
   currentEmotion: '',
   desiredOutcome: '',
+  age: '',    // 初始化
+  gender: '', // 初始化
 };
 
-// 创建 slice
 const questionnaireSlice = createSlice({
   name: 'questionnaire',
   initialState,
@@ -29,6 +30,5 @@ const questionnaireSlice = createSlice({
   },
 });
 
-// 导出 actions 和 reducer
 export const { updateAnswer } = questionnaireSlice.actions;
 export default questionnaireSlice.reducer;

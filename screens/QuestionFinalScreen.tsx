@@ -1,10 +1,10 @@
-import React from 'react';
+// screens/QuestionFinalScreen.tsximport React from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
 import { useSelector } from 'react-redux';
 import { RootState } from '../redux/store';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../App';
-import { sendQuestionnaireData } from '../service/api';
+import { sendQuestionnaireData, checkBackendConnection } from '../service/api';
 
 type FinalScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'FinalScreen'>;
 
@@ -17,10 +17,12 @@ export default function QuestionFinalScreen({ navigation }: Props) {
 
   const handleStartChat = async () => {
     try {
+      await checkBackendConnection();  // 检查后端连接
       await sendQuestionnaireData(questionnaireData);
       navigation.navigate('ChatScreen');
     } catch (error) {
-      console.error('Failed to start AI chat:', error);
+      console.error('Failed to start AI chat, using mock data instead:', error);
+      navigation.navigate('ChatScreen');  // 即使失败也进入聊天页面
     }
   };
 

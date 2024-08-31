@@ -1,10 +1,10 @@
-// /Users/bailangcheng/Desktop/semo/App.tsx
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { Provider } from 'react-redux';
 import { store } from './redux/store';
 import WelcomeScreen from './screens/WelcomeScreen';
+import Question0Screen from './screens/Question0Screen'; 
 import Question1Screen from './screens/Question1Screen';
 import Question2Screen from './screens/Question2Screen';
 import Question3Screen from './screens/Question3Screen';
@@ -16,6 +16,7 @@ const Stack = createStackNavigator();
 
 export type RootStackParamList = {
   Welcome: undefined;
+  Question0: undefined;  
   Question1: undefined;
   Question2: undefined;
   Question3: undefined;
@@ -30,6 +31,7 @@ export default function App() {
       <NavigationContainer>
         <Stack.Navigator initialRouteName="Welcome">
           <Stack.Screen name="Welcome" component={WelcomeScreen} options={{ headerShown: false }} />
+          <Stack.Screen name="Question0" component={Question0Screen} options={{ title: '基本信息' }} /> 
           <Stack.Screen name="Question1" component={Question1Screen} options={{ title: '失恋情况' }} />
           <Stack.Screen name="Question2" component={Question2Screen} options={{ title: '失恋情况' }} />
           <Stack.Screen name="Question3" component={Question3Screen} options={{ title: '失恋情况' }} />
