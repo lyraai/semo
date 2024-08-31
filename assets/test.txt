@@ -1,0 +1,146 @@
+// // // // my-semo-app\App.tsx
+// // // import * as React from 'react';
+// // // import { Text, View, StyleSheet } from 'react-native';
+
+// // // export default function App() {
+// // //   return (
+// // //     <View style={styles.container}>
+// // //       <Text style={styles.header}>Hello, World!</Text>
+// // //     </View>
+// // //   );
+// // // }
+
+// // // const styles = StyleSheet.create({
+// // //   container: {
+// // //     flex: 1,
+// // //     justifyContent: 'center',
+// // //     alignItems: 'center',
+// // //     backgroundColor: '#fff',
+// // //   },
+// // //   header: {
+// // //     fontSize: 24,
+// // //   },
+// // // });
+// // // my-semo-app\App.tsx
+// // import * as React from 'react';
+// // import { Text, View, StyleSheet } from 'react-native';
+// // import { Provider, useSelector, useDispatch } from 'react-redux';
+// // import { createStore } from 'redux';
+
+// // // 简单的Reducer和初始状态
+// // const initialState = { count: 0 };
+// // function reducer(state = initialState, action: { type: string }) {
+// //   switch (action.type) {
+// //     case 'INCREMENT':
+// //       return { ...state, count: state.count + 1 };
+// //     default:
+// //       return state;
+// //   }
+// // }
+
+// // const store = createStore(reducer);
+
+// // function Main() {
+// //   const count = useSelector((state: { count: number }) => state.count);
+// //   const dispatch = useDispatch();
+
+// //   return (
+// //     <View style={styles.container}>
+// //       <Text style={styles.header}>Count: {count}</Text>
+// //       <Text style={styles.button} onPress={() => dispatch({ type: 'INCREMENT' })}>
+// //         Increment
+// //       </Text>
+// //     </View>
+// //   );
+// // }
+
+// // export default function App() {
+// //   return (
+// //     <Provider store={store}>
+// //       <Main />
+// //     </Provider>
+// //   );
+// // }
+
+// // const styles = StyleSheet.create({
+// //   container: {
+// //     flex: 1,
+// //     justifyContent: 'center',
+// //     alignItems: 'center',
+// //     backgroundColor: '#fff',
+// //   },
+// //   header: {
+// //     fontSize: 24,
+// //   },
+// //   button: {
+// //     fontSize: 18,
+// //     color: 'blue',
+// //     marginTop: 20,
+// //   },
+// // });
+
+// // my-semo-app\App.tsx
+// import * as React from 'react';
+// import { Text, View, StyleSheet } from 'react-native';
+// import { Provider, useSelector, useDispatch } from 'react-redux';
+// import { createStore } from 'redux';
+// import { NavigationContainer } from '@react-navigation/native';
+// import { createStackNavigator } from '@react-navigation/stack';
+
+// // 简单的Reducer和初始状态
+// const initialState = { count: 0 };
+// function reducer(state = initialState, action: { type: string }) {
+//   switch (action.type) {
+//     case 'INCREMENT':
+//       return { ...state, count: state.count + 1 };
+//     default:
+//       return state;
+//   }
+// }
+
+// const store = createStore(reducer);
+
+// function HomeScreen() {
+//   const count = useSelector((state: { count: number }) => state.count);
+//   const dispatch = useDispatch();
+
+//   return (
+//     <View style={styles.container}>
+//       <Text style={styles.header}>Count: {count}</Text>
+//       <Text style={styles.button} onPress={() => dispatch({ type: 'INCREMENT' })}>
+//         Increment
+//       </Text>
+//     </View>
+//   );
+// }
+
+// const Stack = createStackNavigator();
+
+// export default function App() {
+//   return (
+//     <Provider store={store}>
+//       <NavigationContainer>
+//         <Stack.Navigator>
+//           <Stack.Screen name="Home" component={HomeScreen} />
+//         </Stack.Navigator>
+//       </NavigationContainer>
+//     </Provider>
+//   );
+// }
+
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//     backgroundColor: '#fff',
+//   },
+//   header: {
+//     fontSize: 24,
+//   },
+//   button: {
+//     fontSize: 18,
+//     color: 'blue',
+//     marginTop: 20,
+//   },
+// });

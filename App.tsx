@@ -1,41 +1,40 @@
-// my-semo-app\App.tsx
 import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 import { Provider } from 'react-redux';
-import { store } from './store';
-import { useSelector, useDispatch } from 'react-redux';
-import { increment, decrement } from './features/counter/counterSlice';
-import { RootState } from './store';
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, Button } from 'react-native';
+import { store } from './redux/store';
+import WelcomeScreen from './screens/WelcomeScreen';
+import Question1Screen from './screens/Question1Screen';
+import Question2Screen from './screens/Question2Screen';
+import Question3Screen from './screens/Question3Screen';
+import Question4Screen from './screens/Question4Screen';
+import QuestionFinalScreen from './screens/QuestionFinalScreen';
 
-function Main() {
-  const count = useSelector((state: RootState) => state.counter.value);
-  const dispatch = useDispatch();
+const Stack = createStackNavigator();
 
-  return (
-    <View style={styles.container}>
-      {/* 确保所有文本内容在<Text>组件内 */}
-      <Text>Count: {count}</Text>
-      <Button title="Increment" onPress={() => dispatch(increment())} />
-      <Button title="Decrement" onPress={() => dispatch(decrement())} />
-      <StatusBar style="auto" />
-    </View>
-  );
-}
+export type RootStackParamList = {
+  Welcome: undefined;
+  Question1: undefined;
+  Question2: undefined;
+  Question3: undefined;
+  Question4: undefined;
+  FinalScreen: undefined;
+  ChatScreen: undefined;
+};
 
 export default function App() {
   return (
     <Provider store={store}>
-      <Main />
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName="Welcome">
+          <Stack.Screen name="Welcome" component={WelcomeScreen} options={{ headerShown: false }} />
+          <Stack.Screen name="Question1" component={Question1Screen} options={{ title: '失恋情况' }} />
+          <Stack.Screen name="Question2" component={Question2Screen} options={{ title: '失恋情况' }} />
+          <Stack.Screen name="Question3" component={Question3Screen} options={{ title: '失恋情况' }} />
+          <Stack.Screen name="Question4" component={Question4Screen} options={{ title: '失恋情况' }} />
+          <Stack.Screen name="FinalScreen" component={QuestionFinalScreen} options={{ title: '完成' }} />
+        </Stack.Navigator>
+      </NavigationContainer>
     </Provider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
