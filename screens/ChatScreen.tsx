@@ -1,13 +1,29 @@
-// /Users/bailangcheng/Desktop/semo/screens/ChatScreen.tsx
-import React, { useState, useEffect } from 'react';
-import { View, TextInput, TouchableOpacity, Text, StyleSheet, ScrollView } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import {
+  View,
+  TextInput,
+  TouchableOpacity,
+  Text,
+  StyleSheet,
+  ScrollView,
+  ActivityIndicator,
+} from 'react-native';
 import { getAIResponse } from '../service/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+type Message = { sender: 'user' | 'ai'; text: string };
 
 export default function ChatScreen() {
-  const [messages, setMessages] = useState<{ sender: 'user' | 'ai', text: string }[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState<string>('');
   const [semoUserId, setSemoUserId] = useState<string | null>(null);
+  const [emotion, setEmotion] = useState<number | null>(null);
+  const [predictedOptions, setPredictedOptions] = useState<string[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const navigation = useNavigation();
+  const scrollViewRef = useRef<ScrollView>(null);
 
   useEffect(() => {
     const fetchUserId = async () => {
@@ -15,7 +31,6 @@ export default function ChatScreen() {
         const storedUserId = await AsyncStorage.getItem('semo_user_id');
         if (storedUserId) {
           setSemoUserId(storedUserId);
-          console.log('User ID fetched:', storedUserId); // 调试日志
         } else {
           console.error('No User ID found in AsyncStorage');
         }
@@ -27,27 +42,57 @@ export default function ChatScreen() {
     fetchUserId();
   }, []);
 
+  useEffect(() => {
+    scrollViewRef.current?.scrollToEnd({ animated: true });
+  }, [messages]);
+
   const sendMessage = async () => {
     if (inputText.trim() !== '' && semoUserId) {
       const newMessages = [...messages, { sender: 'user', text: inputText }];
       setMessages(newMessages);
       setInputText('');
+      setLoading(true);
 
       try {
-        console.log('Sending message:', inputText, 'with user ID:', semoUserId); // 调试日志
-        const aiResponse = await getAIResponse(semoUserId, inputText);
-        setMessages([...newMessages, { sender: 'ai', text: aiResponse }]);
+        const { response, emotion, predicted_options } = await getAIResponse(semoUserId, inputText);
+        setMessages([...newMessages, { sender: 'ai', text: response }]);
+        setEmotion(emotion);
+        setPredictedOptions(predicted_options);
       } catch (error) {
         console.error('Failed to get AI response:', error);
+      } finally {
+        setLoading(false);
       }
     } else {
       console.error('Message not sent. Either input is empty or User ID is missing.');
     }
   };
 
+  const handleOptionPress = (option: string) => {
+    setInputText(option);
+  };
+
+  const getEmotionColor = (emotionValue: number | null) => {
+    if (emotionValue === null) return '#ddd';
+    if (emotionValue > 0.75) return '#FF6347';
+    if (emotionValue > 0.5) return '#FFA500';
+    if (emotionValue > 0.25) return '#FFFF00';
+    return '#32CD32';
+  };
+
+  const endConversation = () => {
+    // 跳转到报告界面
+    navigation.navigate('AiChatReportScreen');
+  };
+
   return (
-    <View style={styles.container}>
-      <ScrollView style={styles.messagesContainer}>
+    <SafeAreaView style={styles.container}>
+      <ScrollView 
+        style={styles.messagesContainer} 
+        contentContainerStyle={styles.messagesContentContainer}
+        keyboardShouldPersistTaps="handled"
+        ref={scrollViewRef}
+      >
         {messages.map((msg, index) => (
           <View
             key={index}
@@ -60,46 +105,69 @@ export default function ChatScreen() {
             </Text>
           </View>
         ))}
+        {loading && <ActivityIndicator size="large" color="#f06262" style={styles.loadingIndicator} />}
       </ScrollView>
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
-          value={inputText}
-          onChangeText={setInputText}
-          placeholder="你可以继续输入..."
-        />
-        <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
-          <Text style={styles.sendButtonText}>发送</Text>
+
+      <View style={styles.footerContainer}>
+        <View style={styles.emotionIndicatorContainer}>
+          <View style={[styles.emotionIndicator, { backgroundColor: getEmotionColor(emotion) }]} />
+        </View>
+        <View style={styles.optionsContainer}>
+          {predictedOptions.map((option, index) => (
+            <TouchableOpacity key={index} style={styles.optionButton} onPress={() => handleOptionPress(option)}>
+              <Text style={styles.optionButtonText}>{option}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            value={inputText}
+            onChangeText={setInputText}
+            placeholder="你可以继续输入..."
+            multiline={true}
+          />
+          <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
+            <Text style={styles.sendButtonText}>发送</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* 新增的结束对话按钮 */}
+        <TouchableOpacity style={styles.endButton} onPress={endConversation}>
+          <Text style={styles.endButtonText}>结束对话</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#F7F4EE',
   },
   messagesContainer: {
     flex: 1,
+  },
+  messagesContentContainer: {
     paddingHorizontal: 20,
-    paddingTop: 10,
+    paddingVertical: 15,
+    justifyContent: 'flex-end',
   },
   userMessageBubble: {
     backgroundColor: '#f06262',
     alignSelf: 'flex-end',
     maxWidth: '70%',
-    padding: 15,
-    borderRadius: 30,
+    padding: 10,
+    borderRadius: 20,
     marginVertical: 5,
   },
   aiMessageBubble: {
     backgroundColor: '#ffffff',
     alignSelf: 'flex-start',
     maxWidth: '70%',
-    padding: 15,
-    borderRadius: 30,
+    padding: 10,
+    borderRadius: 20,
     marginVertical: 5,
   },
   userMessageText: {
@@ -110,13 +178,44 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#333',
   },
+  loadingIndicator: {
+    marginVertical: 10,
+  },
+  footerContainer: {
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#ddd',
+  },
+  emotionIndicatorContainer: {
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  emotionIndicator: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+  },
+  optionsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    flexWrap: 'wrap',
+    marginBottom: 10,
+  },
+  optionButton: {
+    backgroundColor: '#f06262',
+    borderRadius: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    margin: 5,
+  },
+  optionButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
+  },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 20,
-    paddingBottom: 50,
-    borderTopWidth: 0,
-    borderColor: '#ddd',
   },
   input: {
     flex: 1,
@@ -134,9 +233,21 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingVertical: 10,
     paddingHorizontal: 20,
-  },
-  sendButtonText: {
+    },
+    sendButtonText: {
     color: '#ffffff',
     fontSize: 16,
-  },
-});
+    },
+    endButton: {
+    backgroundColor: '#f06262',
+    borderRadius: 30,
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    marginTop: 10,
+    alignItems: 'center',
+    },
+    endButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    },
+  });

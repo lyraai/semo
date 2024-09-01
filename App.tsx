@@ -1,38 +1,41 @@
-// /Users/bailangcheng/Desktop/semo/App.tsx
 import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import { View } from 'react-native';
 import { Provider } from 'react-redux';
 import { store } from './redux/store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { generateUserId, checkBackendConnection } from './service/api'; 
+import { generateUserId, checkBackendConnection } from './service/api';
 import WelcomeScreen from './screens/WelcomeScreen';
-import Question0Screen from './screens/Question0Screen'; 
+import Question0Screen from './screens/Question0Screen';
 import Question1Screen from './screens/Question1Screen';
 import Question2Screen from './screens/Question2Screen';
 import Question3Screen from './screens/Question3Screen';
 import Question4Screen from './screens/Question4Screen';
 import QuestionFinalScreen from './screens/QuestionFinalScreen';
 import ChatScreen from './screens/ChatScreen';
+import AiChatReportScreen from './screens/AiChatReportScreen';
+import { Icon } from 'react-native-elements';
 
 const Stack = createStackNavigator();
 
 export type RootStackParamList = {
   Welcome: undefined;
-  Question0: undefined;  
+  Question0: undefined;
   Question1: undefined;
   Question2: undefined;
   Question3: undefined;
   Question4: undefined;
   FinalScreen: undefined;
   ChatScreen: undefined;
+  AiChatReportScreen: undefined;
 };
 
 export default function App() {
   useEffect(() => {
     const initializeUserId = async () => {
       try {
-        await checkBackendConnection();  // 检查后端连接性
+        await checkBackendConnection(); // 检查后端连接性
         const storedUserId = await AsyncStorage.getItem('semo_user_id');
         if (!storedUserId) {
           const newUserId = await generateUserId();
@@ -46,19 +49,55 @@ export default function App() {
     initializeUserId();
   }, []);
 
+  const defaultScreenOptions = ({ navigation }) => ({
+    headerLeft: () => (
+      <Icon
+        name="chevron-left"
+        type="feather"
+        color="#f06262"
+        size={30}
+        onPress={() => navigation.goBack()}
+        containerStyle={{ marginLeft: 15 }}
+      />
+    ),
+    headerTitle: "", 
+    headerStyle: {
+      backgroundColor: '#F7F4EE',
+    },
+  });
+
   return (
     <Provider store={store}>
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="Welcome">
-          <Stack.Screen name="Welcome" component={WelcomeScreen} options={{ headerShown: false }} />
-          <Stack.Screen name="Question0" component={Question0Screen} options={{ title: '基本信息' }} /> 
-          <Stack.Screen name="Question1" component={Question1Screen} options={{ title: '失恋情况' }} />
-          <Stack.Screen name="Question2" component={Question2Screen} options={{ title: '失恋情况' }} />
-          <Stack.Screen name="Question3" component={Question3Screen} options={{ title: '失恋情况' }} />
-          <Stack.Screen name="Question4" component={Question4Screen} options={{ title: '失恋情况' }} />
-          <Stack.Screen name="FinalScreen" component={QuestionFinalScreen} options={{ title: '完成' }} />
-          <Stack.Screen name="ChatScreen" component={ChatScreen} options={{ title: 'AI 对话' }} />
-        </Stack.Navigator>
+        <View style={{ flex: 1, backgroundColor: '#F7F4EE' }}>
+          <Stack.Navigator initialRouteName="Welcome" screenOptions={defaultScreenOptions}>
+            <Stack.Screen
+              name="Welcome"
+              component={WelcomeScreen}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen name="Question0" component={Question0Screen} />
+            <Stack.Screen name="Question1" component={Question1Screen} />
+            <Stack.Screen name="Question2" component={Question2Screen} />
+            <Stack.Screen name="Question3" component={Question3Screen} />
+            <Stack.Screen name="Question4" component={Question4Screen} />
+            <Stack.Screen name="FinalScreen" component={QuestionFinalScreen} />
+            <Stack.Screen 
+              name="ChatScreen" 
+              component={ChatScreen} 
+              options={{
+                headerTitle: "与semo聊天",
+              }} 
+            />
+            <Stack.Screen 
+              name="AiChatReportScreen" 
+              component={AiChatReportScreen} 
+              options={{
+                headerTitle: "semo总结",
+              }} 
+            />
+          </Stack.Navigator>
+        </View>
       </NavigationContainer>
     </Provider>
   );

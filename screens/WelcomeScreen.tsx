@@ -1,3 +1,4 @@
+// /Users/bailangcheng/Desktop/semo/screens/WelcomeScreen.tsx
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, Button } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -50,17 +51,18 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: '#F7F4EE',
+    padding: 20,
   },
   logo: {
-    width: 120,
-    height: 120,
+    width: 250,
+    height: 250,
     marginBottom: 40,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#f06262',
     marginBottom: 10,
   },
   subtitle: {
@@ -70,7 +72,7 @@ const styles = StyleSheet.create({
   },
   connectionStatus: {
     fontSize: 16,
-    color: 'red',
+    color: '#f06262',
     marginBottom: 20,
   },
 });

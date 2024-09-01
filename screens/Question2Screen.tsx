@@ -37,7 +37,8 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: '#F7F4EE',
+    padding: 20,
   },
   question: {
     fontSize: 20,
