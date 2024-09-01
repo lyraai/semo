@@ -1,34 +1,77 @@
-import React, { useState } from 'react';
-import { View, TextInput, Button, Text, StyleSheet } from 'react-native';
+// /Users/bailangcheng/Desktop/semo/screens/ChatScreen.tsx
+import React, { useState, useEffect } from 'react';
+import { View, TextInput, TouchableOpacity, Text, StyleSheet, ScrollView } from 'react-native';
+import { getAIResponse } from '../service/api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function ChatScreen() {
-  const [messages, setMessages] = useState<string[]>([]);
+  const [messages, setMessages] = useState<{ sender: 'user' | 'ai', text: string }[]>([]);
   const [inputText, setInputText] = useState<string>('');
+  const [semoUserId, setSemoUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchUserId = async () => {
+      try {
+        const storedUserId = await AsyncStorage.getItem('semo_user_id');
+        if (storedUserId) {
+          setSemoUserId(storedUserId);
+          console.log('User ID fetched:', storedUserId); // 调试日志
+        } else {
+          console.error('No User ID found in AsyncStorage');
+        }
+      } catch (error) {
+        console.error('Failed to fetch user ID:', error);
+      }
+    };
+
+    fetchUserId();
+  }, []);
 
   const sendMessage = async () => {
-    if (inputText.trim() !== '') {
-      setMessages([...messages, inputText]);
+    if (inputText.trim() !== '' && semoUserId) {
+      const newMessages = [...messages, { sender: 'user', text: inputText }];
+      setMessages(newMessages);
       setInputText('');
-      // 这里调用你的 AI 后端服务获取回复
-      // const aiResponse = await getAIResponse(inputText);
-      // setMessages([...messages, inputText, aiResponse]);
+
+      try {
+        console.log('Sending message:', inputText, 'with user ID:', semoUserId); // 调试日志
+        const aiResponse = await getAIResponse(semoUserId, inputText);
+        setMessages([...newMessages, { sender: 'ai', text: aiResponse }]);
+      } catch (error) {
+        console.error('Failed to get AI response:', error);
+      }
+    } else {
+      console.error('Message not sent. Either input is empty or User ID is missing.');
     }
   };
 
   return (
     <View style={styles.container}>
-      <View style={styles.messagesContainer}>
+      <ScrollView style={styles.messagesContainer}>
         {messages.map((msg, index) => (
-          <Text key={index} style={styles.message}>{msg}</Text>
+          <View
+            key={index}
+            style={[
+              msg.sender === 'user' ? styles.userMessageBubble : styles.aiMessageBubble,
+            ]}
+          >
+            <Text style={msg.sender === 'user' ? styles.userMessageText : styles.aiMessageText}>
+              {msg.text}
+            </Text>
+          </View>
         ))}
+      </ScrollView>
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.input}
+          value={inputText}
+          onChangeText={setInputText}
+          placeholder="你可以继续输入..."
+        />
+        <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
+          <Text style={styles.sendButtonText}>发送</Text>
+        </TouchableOpacity>
       </View>
-      <TextInput
-        style={styles.input}
-        value={inputText}
-        onChangeText={setInputText}
-        placeholder="输入你的消息..."
-      />
-      <Button title="发送" onPress={sendMessage} />
     </View>
   );
 }
@@ -36,22 +79,64 @@ export default function ChatScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'flex-end',
-    padding: 16,
+    backgroundColor: '#f5f5f5',
   },
   messagesContainer: {
     flex: 1,
-    justifyContent: 'flex-start',
+    paddingHorizontal: 20,
+    paddingTop: 10,
   },
-  message: {
+  userMessageBubble: {
+    backgroundColor: '#f06262',
+    alignSelf: 'flex-end',
+    maxWidth: '70%',
+    padding: 15,
+    borderRadius: 30,
+    marginVertical: 5,
+  },
+  aiMessageBubble: {
+    backgroundColor: '#ffffff',
+    alignSelf: 'flex-start',
+    maxWidth: '70%',
+    padding: 15,
+    borderRadius: 30,
+    marginVertical: 5,
+  },
+  userMessageText: {
     fontSize: 16,
-    marginVertical: 4,
+    color: '#ffffff',
+  },
+  aiMessageText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 20,
+    paddingBottom: 50,
+    borderTopWidth: 0,
+    borderColor: '#ddd',
   },
   input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 8,
-    borderRadius: 4,
-    marginBottom: 8,
+    flex: 1,
+    borderWidth: 1.5,
+    borderColor: '#f06262',
+    borderRadius: 20,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    fontSize: 16,
+    backgroundColor: '#ffffff',
+  },
+  sendButton: {
+    marginLeft: 10,
+    backgroundColor: '#f06262',
+    borderRadius: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+  },
+  sendButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
   },
 });

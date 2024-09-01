@@ -12,11 +12,27 @@ let useMock = false;
 export const checkBackendConnection = async () => {
   try {
     const response = await axios.get(`${BASE_URL}/api/semo/v1/hello`);
-    return response.data; // 假设返回一个简单的字符串或对象
+    useMock = false; // 后端连接成功，使用真实模式
+    return response.data;
   } catch (error) {
     console.error('Failed to connect to backend:', error);
     useMock = true;  // 如果连接失败，则切换到模拟模式
-    throw error;
+  }
+};
+
+// 生产用户ID的函数
+export const generateUserId = async () => {
+  if (useMock) {
+    return mockGenerateUserId();
+  }
+
+  try {
+    const response = await axios.get(`${BASE_URL}/api/semo/v1/generate_user_id`);
+    return response.data.semo_user_id;
+  } catch (error) {
+    console.error('Failed to generate user ID:', error);
+    useMock = true;  // 切换到模拟模式
+    return mockGenerateUserId();
   }
 };
 
@@ -31,27 +47,38 @@ export const sendQuestionnaireData = async (data: QuestionnaireData) => {
     return response.data;
   } catch (error) {
     console.error('Failed to send questionnaire data:', error);
-    // 切换到模拟模式
     useMock = true;
     return mockSendQuestionnaireData(data);
   }
 };
 
 // 获取AI回复的函数
-export const getAIResponse = async (message: string) => {
+export const getAIResponse = async (semoUserId: string, message: string) => {
   if (useMock) {
     return mockGetAIResponse(message);
   }
 
   try {
-    const response = await axios.post(`${BASE_URL}/api/semo/v1/chat`, { message });
+    const response = await axios.post(`${BASE_URL}/api/semo/v1/chat`, 
+    { user_input: message },
+    {
+      params: {
+        semo_user_id: semoUserId
+      }
+    });
     return response.data.reply; // 假设后端返回的回复字段为 reply
   } catch (error) {
     console.error('Failed to get AI response:', error);
-    // 切换到模拟模式
     useMock = true;
     return mockGetAIResponse(message);
   }
+};
+
+// 模拟生成用户ID的函数
+const mockGenerateUserId = async () => {
+  return new Promise((resolve) =>
+    setTimeout(() => resolve(`mock_user_id_${Math.floor(Math.random() * 10000)}`), 500)
+  );
 };
 
 // 模拟发送问卷数据的函数

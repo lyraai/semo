@@ -17,7 +17,7 @@ export default function Question2Screen({ navigation }: Props) {
   const dispatch = useDispatch();
 
   const handleAnswer = (answer: string) => {
-    dispatch(updateAnswer({ question: 'breakupDuration', answer }));
+    dispatch(updateAnswer({ question: 'duration', answer }));
     navigation.navigate('Question3');
   };
 

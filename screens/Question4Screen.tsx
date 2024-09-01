@@ -16,7 +16,7 @@ export default function Question4Screen({ navigation }: Props) {
   const dispatch = useDispatch();
 
   const handleAnswer = (answer: string) => {
-    dispatch(updateAnswer({ question: 'desiredOutcome', answer }));
+    dispatch(updateAnswer({ question: 'expectation', answer }));
     navigation.navigate('FinalScreen'); // 假设接下来有一个终点页面
   };
 

@@ -16,7 +16,7 @@ export default function Question1Screen({ navigation }: Props) {
   const dispatch = useDispatch();
 
   const handleAnswer = (answer: string) => {
-    dispatch(updateAnswer({ question: 'relationshipStatus', answer }));
+    dispatch(updateAnswer({ question: 'current_state', answer }));
     navigation.navigate('Question2');
   };
 

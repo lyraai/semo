@@ -16,7 +16,7 @@ export default function Question3Screen({ navigation }: Props) {
   const dispatch = useDispatch();
 
   const handleAnswer = (answer: string) => {
-    dispatch(updateAnswer({ question: 'currentEmotion', answer }));
+    dispatch(updateAnswer({ question: 'current_feeling', answer }));
     navigation.navigate('Question4');
   };
 

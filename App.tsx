@@ -1,8 +1,11 @@
-import React from 'react';
+// /Users/bailangcheng/Desktop/semo/App.tsx
+import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { Provider } from 'react-redux';
 import { store } from './redux/store';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { generateUserId, checkBackendConnection } from './service/api'; 
 import WelcomeScreen from './screens/WelcomeScreen';
 import Question0Screen from './screens/Question0Screen'; 
 import Question1Screen from './screens/Question1Screen';
@@ -26,6 +29,23 @@ export type RootStackParamList = {
 };
 
 export default function App() {
+  useEffect(() => {
+    const initializeUserId = async () => {
+      try {
+        await checkBackendConnection();  // 检查后端连接性
+        const storedUserId = await AsyncStorage.getItem('semo_user_id');
+        if (!storedUserId) {
+          const newUserId = await generateUserId();
+          await AsyncStorage.setItem('semo_user_id', newUserId);
+        }
+      } catch (error) {
+        console.error('Failed to initialize user ID:', error);
+      }
+    };
+
+    initializeUserId();
+  }, []);
+
   return (
     <Provider store={store}>
       <NavigationContainer>

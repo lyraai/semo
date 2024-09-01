@@ -31,10 +31,10 @@ export default function QuestionFinalScreen({ navigation }: Props) {
       <Text style={styles.header}>问卷完成</Text>
       <Text style={styles.summary}>感谢您完成问卷！</Text>
       <Text style={styles.summary}>您选择的答案：</Text>
-      <Text style={styles.text}>关系状态: {questionnaireData.relationshipStatus}</Text>
-      <Text style={styles.text}>分开时长: {questionnaireData.breakupDuration}</Text>
-      <Text style={styles.text}>当前感受: {questionnaireData.currentEmotion}</Text>
-      <Text style={styles.text}>想要的结果: {questionnaireData.desiredOutcome}</Text>
+      <Text style={styles.text}>关系状态: {questionnaireData.current_state}</Text>
+      <Text style={styles.text}>分开时长: {questionnaireData.duration}</Text>
+      <Text style={styles.text}>当前感受: {questionnaireData.current_feeling}</Text>
+      <Text style={styles.text}>想要的结果: {questionnaireData.expectation}</Text>
       <Button title="开始AI对话" onPress={handleStartChat} />
     </View>
   );

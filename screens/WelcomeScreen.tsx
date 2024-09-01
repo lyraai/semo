@@ -1,8 +1,8 @@
-// my-semo-app/screens/WelcomeScreen.tsx
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, Button } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../App';
+import { checkBackendConnection } from '../service/api';
 
 type WelcomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Welcome'>;
 
@@ -11,11 +11,31 @@ type Props = {
 };
 
 export default function WelcomeScreen({ navigation }: Props) {
+  const [connectionStatus, setConnectionStatus] = useState<string | null>(null);
+
+  useEffect(() => {
+    const checkConnection = async () => {
+      try {
+        const result = await checkBackendConnection();
+        setConnectionStatus(result.message || '连接成功'); // 假设返回的对象有 message 属性
+      } catch (error) {
+        setConnectionStatus('无法连接到服务器，已切换到模拟模式');
+      }
+    };
+
+    checkConnection();
+  }, []);
+
   return (
     <View style={styles.container}>
       <Image source={require('../assets/logos/1x/logo.png')} style={styles.logo} />
       <Text style={styles.title}>欢迎来到Semo</Text>
       <Text style={styles.subtitle}>你的情绪急救助手</Text>
+
+      {connectionStatus && (
+        <Text style={styles.connectionStatus}>{connectionStatus}</Text>
+      )}
+
       <Button
         title="下一步"
         onPress={() => navigation.navigate('Question0')}
@@ -47,5 +67,10 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#666',
     marginBottom: 40,
+  },
+  connectionStatus: {
+    fontSize: 16,
+    color: 'red',
+    marginBottom: 20,
   },
 });
