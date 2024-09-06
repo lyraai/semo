@@ -30,7 +30,7 @@ export default function WelcomeScreen({ navigation }: Props) {
   return (
     <View style={styles.container}>
       <Image source={require('../assets/logos/1x/logo.png')} style={styles.logo} />
-      <Text style={styles.title}>欢迎来到Semo</Text>
+      <Text style={styles.title}>欢迎来到Semo心茉</Text>
       <Text style={styles.subtitle}>你的情绪急救助手</Text>
 
       {connectionStatus && (
@@ -38,7 +38,7 @@ export default function WelcomeScreen({ navigation }: Props) {
       )}
 
       <Button
-        title="下一步"
+        title="开始"
         onPress={() => navigation.navigate('Question0')}
         color="#f06262"
       />

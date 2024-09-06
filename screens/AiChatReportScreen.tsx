@@ -14,24 +14,6 @@ export default function AiChatReportScreen() {
 
   return (
     <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <Icon
-          name="chevron-left"
-          type="feather"
-          color="#f06262"
-          size={30}
-          onPress={() => console.log('Back')}
-          containerStyle={{ marginLeft: 15 }}
-        />
-        <Text style={styles.headerTitle}>semo总结</Text>
-        <Icon
-          name="butterfly-outline"
-          type="material-community"
-          color="#f06262"
-          size={30}
-          containerStyle={{ marginRight: 15 }}
-        />
-      </View>
 
       <View style={styles.infoContainer}>
         <View style={styles.infoBlock}>
@@ -111,7 +93,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 20,
-    backgroundColor: '#fff',
+    backgroundColor: '#F7F4EE',
   },
   headerTitle: {
     fontSize: 20,

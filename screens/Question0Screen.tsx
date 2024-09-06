@@ -17,6 +17,7 @@ export default function Question0Screen({ navigation }: Props) {
   const dispatch = useDispatch();
   const [age, setAge] = useState('20');  // 默认年龄
   const [gender, setGender] = useState('');  // 默认性别为空，用户需要选择
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleGenderSelect = (selectedGender: string) => {
     setGender(selectedGender);
@@ -24,8 +25,10 @@ export default function Question0Screen({ navigation }: Props) {
 
   const handleNext = () => {
     if (gender && age) {
+      setIsLoading(true);
       dispatch(updateAnswer({ question: 'age', answer: age }));
       dispatch(updateAnswer({ question: 'gender', answer: gender }));
+      setIsLoading(false);
       navigation.navigate('Question1');
     }
   };
@@ -65,8 +68,14 @@ export default function Question0Screen({ navigation }: Props) {
         ))}
       </Picker>
 
-      <TouchableOpacity onPress={handleNext} style={styles.nextButton}>
-        <Text style={styles.nextButtonText}>下一步</Text>
+      <TouchableOpacity
+        onPress={handleNext}
+        style={[styles.nextButton, (!gender || !age) && styles.disabledNextButton]}
+        disabled={!gender || !age || isLoading}  // 禁用条件
+      >
+        <Text style={[styles.nextButtonText, (!gender || !age) && styles.disabledNextButtonText]}>
+          {isLoading ? '加载中...' : '下一步'}
+        </Text>
       </TouchableOpacity>
     </View>
   );
@@ -104,13 +113,20 @@ const styles = StyleSheet.create({
   },
   nextButton: {
     marginTop: 20,
-    backgroundColor: '#f06262',
+    backgroundColor: '#F06262',
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 5,
+    borderRadius: 30,
+    alignItems: 'center',
+  },
+  disabledNextButton: {
+    backgroundColor: '#ccc',
   },
   nextButtonText: {
     color: '#fff',
     fontSize: 18,
+  },
+  disabledNextButtonText: {
+    color: '#666',
   },
 });

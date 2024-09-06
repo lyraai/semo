@@ -1,5 +1,6 @@
-// screens/QuestionFinalScreen.tsximport React from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
+// screens/QuestionFinalScreen.tsx
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useSelector } from 'react-redux';
 import { RootState } from '../redux/store';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -14,8 +15,10 @@ type Props = {
 
 export default function QuestionFinalScreen({ navigation }: Props) {
   const questionnaireData = useSelector((state: RootState) => state.questionnaire);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleStartChat = async () => {
+    setIsLoading(true);
     try {
       await checkBackendConnection();  // 检查后端连接
       await sendQuestionnaireData(questionnaireData);
@@ -23,6 +26,8 @@ export default function QuestionFinalScreen({ navigation }: Props) {
     } catch (error) {
       console.error('Failed to start AI chat, using mock data instead:', error);
       navigation.navigate('ChatScreen');  // 即使失败也进入聊天页面
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -35,7 +40,16 @@ export default function QuestionFinalScreen({ navigation }: Props) {
       <Text style={styles.text}>分开时长: {questionnaireData.duration}</Text>
       <Text style={styles.text}>当前感受: {questionnaireData.current_feeling}</Text>
       <Text style={styles.text}>想要的结果: {questionnaireData.expectation}</Text>
-      <Button title="开始AI对话" onPress={handleStartChat} />
+
+      <TouchableOpacity
+        style={[styles.nextButton, isLoading && styles.disabledNextButton]}  // 加载中时禁用按钮
+        onPress={handleStartChat}
+        disabled={isLoading}  // 禁用按钮防止重复点击
+      >
+        <Text style={[styles.nextButtonText, isLoading && styles.disabledNextButtonText]}>
+          {isLoading ? '加载中...' : '开始AI对话'}
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -60,5 +74,24 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 16,
     marginBottom: 5,
+  },
+  nextButton: {
+    backgroundColor: '#f06262',
+    padding: 15,
+    borderRadius: 30,
+    width: '80%',
+    alignItems: 'center',
+    marginTop: 30,
+  },
+  disabledNextButton: {
+    backgroundColor: '#ccc',
+  },
+  nextButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  disabledNextButtonText: {
+    color: '#666',
   },
 });
