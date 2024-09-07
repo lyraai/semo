@@ -1,3 +1,4 @@
 git add .
-git commit -m "basic features and ui updated, wait for API test "
+git commit -m "API tested updated "
 git push
+
