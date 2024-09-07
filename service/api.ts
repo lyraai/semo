@@ -3,21 +3,23 @@ import axios from 'axios';
 import { QuestionnaireData } from '../redux/slices/questionnaireSlice';
 
 const BASE_URL = 'https://flask-hello-world-295622083030.asia-northeast1.run.app'; // 后端API的基础URL
-let useMock = false; // 用于标识是否使用模拟数据
-
+export let useMock = false; // 导出 useMock 变量
 /**
  * 检查后端连接
  * 
  * 通过发送GET请求验证与后端的连接。如果连接失败，切换为使用模拟数据模式。
  */
+
 export const checkBackendConnection = async () => {
   try {
     const response = await axios.get(`${BASE_URL}/api/semo/v1/hello`);
-    useMock = false; // 如果连接成功，设置为非模拟模式
+    console.log('Connected to backend'); // 连接成功时日志输出
+    useMock = false;
     return response.data;
   } catch (error) {
     console.error('Failed to connect to backend:', error);
-    useMock = true; // 连接失败，切换为模拟模式
+    console.log('Switching to mock mode'); // 进入模拟模式时日志输出
+    useMock = true;
   }
 };
 
@@ -78,9 +80,10 @@ export const getAIResponse = async (semoUserId: string, message: string) => {
     { user_input: message },
     {
       params: {
-        semo_user_id: semoUserId
+        semo_user_id: semoUserId // 确保将 userId 作为查询参数传递
       }
     });
+    console.log("Response from backend:", response.data); // 输出后端返回的完整数据
     return response.data; // 返回完整的响应数据
   } catch (error) {
     console.error('Failed to get AI response:', error);
