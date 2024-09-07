@@ -1,9 +1,11 @@
 // /Users/bailangcheng/Desktop/semo/screens/WelcomeScreen.tsx
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet, Button } from 'react-native';
+import { View, Text, Image, StyleSheet, Button, Alert } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../App';
-import { checkBackendConnection } from '../service/api';
+import { checkBackendConnection, generateUserId } from '../service/api';
+import { useDispatch } from 'react-redux';  // 引入 useDispatch
+import { updateUserId } from '../redux/slices/userSlice';  // 引入 action 来更新 userId
 
 type WelcomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Welcome'>;
 
@@ -13,7 +15,8 @@ type Props = {
 
 export default function WelcomeScreen({ navigation }: Props) {
   const [connectionStatus, setConnectionStatus] = useState<string | null>(null);
-
+  const dispatch = useDispatch();  // 使用 Redux dispatch
+  
   useEffect(() => {
     const checkConnection = async () => {
       try {
@@ -26,6 +29,16 @@ export default function WelcomeScreen({ navigation }: Props) {
 
     checkConnection();
   }, []);
+
+  const handleGenerateUserId = async () => {
+    try {
+      const id = await generateUserId();
+      dispatch(updateUserId(id));  // 将 userId 存储到 Redux
+      Alert.alert('用户ID生成成功', `生成的用户ID: ${id}`);
+    } catch (error) {
+      Alert.alert('生成用户ID失败', '请检查网络连接或后端状态');
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -42,6 +55,11 @@ export default function WelcomeScreen({ navigation }: Props) {
         onPress={() => navigation.navigate('Question0')}
         color="#f06262"
       />
+
+      {/* 新增的生成用户ID的按钮 */}
+      <View style={styles.testButtonContainer}>
+        <Button title="测试生成用户ID" onPress={handleGenerateUserId} color="#4CAF50" />
+      </View>
     </View>
   );
 }
@@ -74,5 +92,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#f06262',
     marginBottom: 20,
+  },
+  testButtonContainer: {
+    marginTop: 20,
+  },
+  userIdText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#4CAF50',
   },
 });

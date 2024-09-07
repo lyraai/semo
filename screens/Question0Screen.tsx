@@ -6,6 +6,7 @@ import { useDispatch } from 'react-redux';
 import { updateAnswer } from '../redux/slices/questionnaireSlice';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../App';
+import { colors } from '../styles/color'; // 导入颜色文件
 
 type Question0ScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Question0'>;
 
@@ -86,7 +87,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F7F4EE',
+    backgroundColor: colors.background, // 使用全局背景颜色
     padding: 20,
   },
   label: {
@@ -102,10 +103,10 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     marginHorizontal: 15,
-    tintColor: '#888',
+    tintColor: colors.iconTint, // 使用全局图标默认颜色
   },
   selectedIcon: {
-    tintColor: '#f06262',
+    tintColor: colors.selectedIconTint, // 使用全局选中图标颜色
   },
   picker: {
     width: 150,
@@ -113,20 +114,20 @@ const styles = StyleSheet.create({
   },
   nextButton: {
     marginTop: 20,
-    backgroundColor: '#F06262',
+    backgroundColor: colors.primary, // 使用全局按钮颜色
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 30,
     alignItems: 'center',
   },
   disabledNextButton: {
-    backgroundColor: '#ccc',
+    backgroundColor: colors.disabled, // 使用全局禁用按钮颜色
   },
   nextButtonText: {
-    color: '#fff',
+    color: colors.textPrimary, // 使用全局按钮文本颜色
     fontSize: 18,
   },
   disabledNextButtonText: {
-    color: '#666',
+    color: colors.textDisabled, // 使用全局禁用文本颜色
   },
 });

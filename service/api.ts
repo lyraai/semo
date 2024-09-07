@@ -2,54 +2,75 @@
 import axios from 'axios';
 import { QuestionnaireData } from '../redux/slices/questionnaireSlice';
 
-const BASE_URL = 'https://flask-hello-world-295622083030.asia-northeast1.run.app';
+const BASE_URL = 'https://flask-hello-world-295622083030.asia-northeast1.run.app'; // 后端API的基础URL
+let useMock = false; // 用于标识是否使用模拟数据
 
-let useMock = false;
-
+/**
+ * 检查后端连接
+ * 
+ * 通过发送GET请求验证与后端的连接。如果连接失败，切换为使用模拟数据模式。
+ */
 export const checkBackendConnection = async () => {
   try {
     const response = await axios.get(`${BASE_URL}/api/semo/v1/hello`);
-    useMock = false;
+    useMock = false; // 如果连接成功，设置为非模拟模式
     return response.data;
   } catch (error) {
     console.error('Failed to connect to backend:', error);
-    useMock = true;
+    useMock = true; // 连接失败，切换为模拟模式
   }
 };
 
+/**
+ * 生成用户ID
+ * 
+ * 如果后端连接失败，使用模拟用户ID生成器。
+ */
 export const generateUserId = async () => {
   if (useMock) {
-    return mockGenerateUserId();
+    return mockGenerateUserId(); // 如果使用模拟模式，返回模拟的用户ID
   }
 
   try {
     const response = await axios.get(`${BASE_URL}/api/semo/v1/generate_user_id`);
-    return response.data.semo_user_id;
+    return response.data.semo_user_id; // 从响应中获取用户ID
   } catch (error) {
     console.error('Failed to generate user ID:', error);
-    useMock = true;
-    return mockGenerateUserId();
+    useMock = true; // 失败后切换为模拟模式
+    return mockGenerateUserId(); // 返回模拟的用户ID
   }
 };
 
-export const sendQuestionnaireData = async (data: QuestionnaireData) => {
+/**
+ * 发送问卷数据
+ * 
+ * 将用户填写的问卷数据发送到后端。如果发送失败，则使用模拟数据发送。
+ */
+export const sendQuestionnaireData = async (semoUserId: string, data: QuestionnaireData) => {
   if (useMock) {
-    return mockSendQuestionnaireData(data);
+    return mockSendQuestionnaireData(data);  // 如果使用模拟模式，发送模拟数据
   }
 
   try {
-    const response = await axios.post(`${BASE_URL}/api/semo/v1/test_info`, data);
+    const response = await axios.post(`${BASE_URL}/api/semo/v1/test_info`, data, {
+      params: { semo_user_id: semoUserId },  // 将 userId 作为查询参数传递
+    });
     return response.data;
   } catch (error) {
     console.error('Failed to send questionnaire data:', error);
-    useMock = true;
-    return mockSendQuestionnaireData(data);
+    useMock = true;  // 失败后切换为模拟模式
+    return mockSendQuestionnaireData(data);  // 返回模拟的响应
   }
 };
 
+/**
+ * 获取AI对话回复
+ * 
+ * 向后端发送用户消息，获取AI的回复。如果获取失败，则使用模拟回复。
+ */
 export const getAIResponse = async (semoUserId: string, message: string) => {
   if (useMock) {
-    return mockGetAIResponse(message);
+    return mockGetAIResponse(message); // 如果使用模拟模式，返回模拟的AI回复
   }
 
   try {
@@ -63,14 +84,19 @@ export const getAIResponse = async (semoUserId: string, message: string) => {
     return response.data; // 返回完整的响应数据
   } catch (error) {
     console.error('Failed to get AI response:', error);
-    useMock = true;
-    return mockGetAIResponse(message);
+    useMock = true; // 失败后切换为模拟模式
+    return mockGetAIResponse(message); // 返回模拟的AI回复
   }
 };
 
+/**
+ * 获取情绪报告
+ * 
+ * 向后端请求情绪报告。如果获取失败，则使用模拟报告数据。
+ */
 export const getReport = async (semoUserId: string) => {
   if (useMock) {
-    return mockGetReport();
+    return mockGetReport(); // 如果使用模拟模式，返回模拟报告
   }
 
   try {
@@ -82,33 +108,55 @@ export const getReport = async (semoUserId: string) => {
     return response.data;
   } catch (error) {
     console.error('Failed to get report:', error);
-    useMock = true;
-    return mockGetReport();
+    useMock = true; // 失败后切换为模拟模式
+    return mockGetReport(); // 返回模拟的报告
   }
 };
 
+/* 模拟函数部分 */
+
+/**
+ * 模拟获取情绪报告
+ * 
+ * 返回模拟的情绪报告，包括摘要、建议和情绪列表。
+ */
 const mockGetReport = async () => {
   console.log('Simulated report retrieval');
   return new Promise((resolve) =>
     setTimeout(() => resolve({
       summary: '模拟的情绪报告摘要。',
       recommendations: ['建议1', '建议2', '建议3'],
-      emotion_list: [0.2, 0.4, 0.6, 0.8],
+      emotion_list: [0.2, 0.4, 0.6, 0.8], // 模拟的情绪值
     }), 1000)
   );
 };
 
+/**
+ * 模拟生成用户ID
+ * 
+ * 返回一个随机生成的模拟用户ID。
+ */
 const mockGenerateUserId = async () => {
   return new Promise((resolve) =>
     setTimeout(() => resolve(`mock_user_id_${Math.floor(Math.random() * 10000)}`), 500)
   );
 };
 
+/**
+ * 模拟发送问卷数据
+ * 
+ * 模拟发送问卷数据并返回成功状态。
+ */
 const mockSendQuestionnaireData = async (data: QuestionnaireData) => {
   console.log('Simulated send questionnaire data:', data);
   return new Promise((resolve) => setTimeout(() => resolve({ status: 'success' }), 1000));
 };
 
+/**
+ * 模拟获取AI回复
+ * 
+ * 根据用户消息返回模拟的AI回复和情绪预测。
+ */
 const mockGetAIResponse = async (message: string) => {
   console.log('Simulated AI response for message:', message);
   return new Promise((resolve) =>
