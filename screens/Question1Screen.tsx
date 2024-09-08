@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
     color: '#fff', // 选中时的文字颜色
   },
   nextButton: {
-    backgroundColor: '#f06262', // 激活时的背景颜色
+    backgroundColor: colors.primary, // 激活时的背景颜色
     padding: 15,
     borderRadius: 30,
     width: '80%',

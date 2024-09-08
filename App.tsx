@@ -62,7 +62,7 @@ export default function App() {
       <Icon
         name="chevron-left"
         type="feather"
-        color="#f06262"
+        color= '#E14D5A'
         size={30}
         onPress={() => navigation.goBack()}
         containerStyle={{ marginLeft: 15 }}

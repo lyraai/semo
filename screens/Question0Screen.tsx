@@ -113,11 +113,10 @@ const styles = StyleSheet.create({
     height: 180,
   },
   nextButton: {
-    marginTop: 20,
-    backgroundColor: colors.primary, // 使用全局按钮颜色
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+    backgroundColor: colors.primary, // 激活时的背景颜色
+    padding: 15,
     borderRadius: 30,
+    width: '80%',
     alignItems: 'center',
   },
   disabledNextButton: {
