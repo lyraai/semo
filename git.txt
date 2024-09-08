@@ -2,3 +2,7 @@ git add .
 git commit -m "API tested updated "
 git push
 
+rm -rf .next
+yarn next dev
+
+npx expo start --web

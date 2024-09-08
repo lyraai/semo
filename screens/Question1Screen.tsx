@@ -5,6 +5,7 @@ import { useDispatch } from 'react-redux';
 import { updateAnswer } from '../redux/slices/questionnaireSlice';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../App';
+import { colors } from '../styles/color';
 
 type Question1ScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Question1'>;
 
@@ -100,10 +101,10 @@ const styles = StyleSheet.create({
     width: '80%',
     alignItems: 'center',
     borderColor: '#ddd',
-    borderWidth: 1,
+    borderWidth: 0,
   },
   selectedButton: {
-    backgroundColor: '#f06262', // 选中时的按钮背景颜色
+    backgroundColor: colors.primary, // 选中时的按钮背景颜色
   },
   buttonText: {
     color: '#333231',

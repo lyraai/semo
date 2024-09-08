@@ -1,3 +1,4 @@
+// /Users/bailangcheng/Desktop/semo/App.tsx
 import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -12,10 +13,14 @@ import Question1Screen from './screens/Question1Screen';
 import Question2Screen from './screens/Question2Screen';
 import Question3Screen from './screens/Question3Screen';
 import Question4Screen from './screens/Question4Screen';
+import MeditationScreen from './screens/MeditationScreen';
+import DeepBreathingScreen from './screens/DeepBreathingScreen';
 import QuestionFinalScreen from './screens/QuestionFinalScreen';
 import ChatScreen from './screens/ChatScreen';
 import AiChatReportScreen from './screens/AiChatReportScreen';
+import ToolSelectionScreen from './screens/ToolSelectionScreen'; // 新增情绪疗愈选择页面
 import { Icon } from 'react-native-elements';
+import 'regenerator-runtime/runtime';
 
 const Stack = createStackNavigator();
 
@@ -28,7 +33,10 @@ export type RootStackParamList = {
   Question4: undefined;
   FinalScreen: undefined;
   ChatScreen: undefined;
-  AiChatReportScreen: undefined;
+  MeditationScreen: undefined;
+  DeepbreathingScreen: undefined;
+  AiChatReportScreen: { userId: string; questionnaireData: any }; 
+  ToolSelectionScreen: { userId: string; questionnaireData: any }; // 添加情绪疗愈选择页面
 };
 
 export default function App() {
@@ -89,12 +97,27 @@ export default function App() {
                 headerTitle: "与semo聊天",
               }} 
             />
+            <Stack.Screen
+              name="Meditation"
+              component={MeditationScreen}
+              options={{ headerTitle: 'Meditation' }}
+            />
             <Stack.Screen 
               name="AiChatReportScreen" 
               component={AiChatReportScreen} 
               options={{
                 headerTitle: "semo总结",
               }} 
+            />
+            <Stack.Screen
+              name="DeepBreathing"
+              component={DeepBreathingScreen} // 确认你有 DeepBreathingScreen
+              options={{ headerTitle: '深呼吸练习' }}
+            />
+            <Stack.Screen
+              name="ToolSelectionScreen" // 添加到导航栈
+              component={ToolSelectionScreen}
+              options={{ headerTitle: "情绪疗愈选择" }}
             />
           </Stack.Navigator>
         </View>

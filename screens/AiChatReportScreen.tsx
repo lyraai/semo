@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import { Icon } from 'react-native-elements';
 import { LineChart } from 'react-native-svg-charts';
+import { colors } from '../styles/color';
 
 export default function AiChatReportScreen() {
   const data = [1, 2, 3, 2.5, 4, 5];
@@ -59,7 +60,7 @@ export default function AiChatReportScreen() {
         <LineChart
           style={styles.chart}
           data={data}
-          svg={{ stroke: '#f06262', strokeWidth: 3 }}
+          svg={{ stroke: colors.primary, strokeWidth: 3 }}
           contentInset={{ top: 20, bottom: 20 }}
           showGrid={false}
         />
@@ -133,7 +134,7 @@ const styles = StyleSheet.create({
   summaryLabel: {
     marginTop: 5,
     fontSize: 14,
-    color: '#f06262',
+    color: colors.primary,
   },
   feedbackContainer: {
     padding: 20,
@@ -170,7 +171,7 @@ const styles = StyleSheet.create({
   },
   footerButtonText: {
     fontSize: 14,
-    color: '#f06262',
+    color: colors.primary,
     marginTop: 5,
   },
 });

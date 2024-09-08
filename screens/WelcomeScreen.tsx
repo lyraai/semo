@@ -1,4 +1,3 @@
-// /Users/bailangcheng/Desktop/semo/screens/WelcomeScreen.tsx
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, Button, Alert } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -55,11 +54,12 @@ export default function WelcomeScreen({ navigation }: Props) {
         onPress={() => navigation.navigate('Question0')}
         color="#f06262"
       />
-
+      
       {/* 新增的生成用户ID的按钮 */}
       <View style={styles.testButtonContainer}>
         <Button title="测试生成用户ID" onPress={handleGenerateUserId} color="#4CAF50" />
       </View>
+
     </View>
   );
 }

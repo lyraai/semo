@@ -4,6 +4,7 @@ import { useDispatch } from 'react-redux';
 import { updateAnswer } from '../redux/slices/questionnaireSlice';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../App';
+import { colors } from '../styles/color';
 
 type Question4ScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Question4'>;
 
@@ -99,10 +100,10 @@ const styles = StyleSheet.create({
     width: '80%',
     alignItems: 'center',
     borderColor: '#ddd',
-    borderWidth: 1,
+    borderWidth: 0,
   },
   selectedButton: {
-    backgroundColor: '#f06262',
+    backgroundColor: colors.primary,
   },
   buttonText: {
     color: '#333231',
@@ -113,7 +114,7 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   nextButton: {
-    backgroundColor: '#f06262',
+    backgroundColor: colors.primary,
     padding: 15,
     borderRadius: 30,
     width: '80%',

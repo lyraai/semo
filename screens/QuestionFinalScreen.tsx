@@ -1,11 +1,12 @@
-// screens/QuestionFinalScreen.tsx
+// /screens/QuestionFinalScreen.tsx
 import React, { useState } from 'react';
 import { Alert, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useSelector } from 'react-redux';
-import { RootState } from '../redux/store';  // 导入 RootState 类型
+import { RootState } from '../redux/store';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../App';
-import { sendQuestionnaireData, checkBackendConnection } from '../service/api';
+import { checkBackendConnection } from '../service/api'; 
+import { colors } from '../styles/color';
 
 type FinalScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'FinalScreen'>;
 
@@ -23,15 +24,17 @@ export default function QuestionFinalScreen({ navigation }: Props) {
       Alert.alert('错误', '无法找到用户ID');
       return;
     }
-
+  
     setIsLoading(true);
     try {
       await checkBackendConnection();  // 检查后端连接
-      await sendQuestionnaireData(userId, questionnaireData);  // 将 userId 传递到后端
-      navigation.navigate('ChatScreen');
+      // 导航到选择疗愈工具页面
+      navigation.navigate('ToolSelectionScreen', {
+        userId,
+        questionnaireData,
+      });
     } catch (error) {
-      console.error('启动AI对话失败:', error);
-      navigation.navigate('ChatScreen');  // 即使失败也进入聊天页面
+      console.error('跳转到疗愈工具选择页面失败:', error);
     } finally {
       setIsLoading(false);
     }
@@ -53,7 +56,7 @@ export default function QuestionFinalScreen({ navigation }: Props) {
         disabled={isLoading}  // 禁用按钮防止重复点击
       >
         <Text style={[styles.nextButtonText, isLoading && styles.disabledNextButtonText]}>
-          {isLoading ? '加载中...' : '开始AI对话'}
+          {isLoading ? '加载中...' : '开始疗愈工具选择'}
         </Text>
       </TouchableOpacity>
     </View>
@@ -82,7 +85,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   nextButton: {
-    backgroundColor: '#f06262',
+    backgroundColor: colors.primary,
     padding: 15,
     borderRadius: 30,
     width: '80%',

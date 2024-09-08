@@ -13,6 +13,7 @@ import { getAIResponse, checkBackendConnection, useMock} from '../service/api'; 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { colors } from '../styles/color';
 
 type Message = { sender: 'user' | 'ai'; text: string };
 
@@ -170,7 +171,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   userMessageBubble: {
-    backgroundColor: '#f06262',
+    backgroundColor: colors.primary,
     alignSelf: 'flex-end',
     maxWidth: '70%',
     padding: 10,
@@ -218,7 +219,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   optionButton: {
-    backgroundColor: '#f06262',
+    backgroundColor: colors.primary,
     borderRadius: 20,
     paddingVertical: 10,
     paddingHorizontal: 15,
@@ -235,7 +236,7 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     borderWidth: 1.5,
-    borderColor: '#f06262',
+    borderColor: colors.primary,
     borderRadius: 20,
     paddingHorizontal: 15,
     paddingVertical: 10,
@@ -244,7 +245,7 @@ const styles = StyleSheet.create({
   },
   sendButton: {
     marginLeft: 10,
-    backgroundColor: '#f06262',
+    backgroundColor: colors.primary,
     borderRadius: 20,
     paddingVertical: 10,
     paddingHorizontal: 20,
@@ -254,7 +255,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   endButton: {
-    backgroundColor: '#f06262',
+    backgroundColor: colors.primary,
     borderRadius: 30,
     paddingVertical: 15,
     paddingHorizontal: 20,
