@@ -1,13 +1,15 @@
-// Users/bailangcheng/Desktop/semo/service/api.ts
+// /Users/bailangcheng/Desktop/semo/service/api.ts
 import axios from 'axios';
 import { QuestionnaireData } from '../redux/slices/questionnaireSlice';
 
 const BASE_URL = 'https://flask-hello-world-295622083030.asia-northeast1.run.app'; // 后端API的基础URL
 export let useMock = false; // 导出 useMock 变量
-
 /**
  * 检查后端连接
+ * 
+ * 通过发送GET请求验证与后端的连接。如果连接失败，切换为使用模拟数据模式。
  */
+
 export const checkBackendConnection = async () => {
   try {
     const response = await axios.get(`${BASE_URL}/api/semo/v1/hello`);
@@ -23,6 +25,8 @@ export const checkBackendConnection = async () => {
 
 /**
  * 生成用户ID
+ * 
+ * 如果后端连接失败，使用模拟用户ID生成器。
  */
 export const generateUserId = async () => {
   if (useMock) {
@@ -42,7 +46,7 @@ export const generateUserId = async () => {
 /**
  * 发送问卷数据
  * 
- * 将用户填写的问卷数据发送到后端
+ * 将用户填写的问卷数据发送到后端。如果发送失败，则使用模拟数据发送。
  */
 export const sendQuestionnaireData = async (semoUserId: string, data: QuestionnaireData) => {
   if (useMock) {
@@ -50,7 +54,9 @@ export const sendQuestionnaireData = async (semoUserId: string, data: Questionna
   }
 
   try {
-    const response = await axios.post(`${BASE_URL}/api/semo/v1/user/${semoUserId}/basic_info`, data); // 将 userId 添加到 URL 路径中
+    const response = await axios.post(`${BASE_URL}/api/semo/v1/basic_info`, data, {
+      params: { semo_user_id: semoUserId },  // 将 userId 作为查询参数传递
+    });
     return response.data;
   } catch (error) {
     console.error('Failed to send questionnaire data:', error);
@@ -61,16 +67,21 @@ export const sendQuestionnaireData = async (semoUserId: string, data: Questionna
 
 /**
  * 获取AI对话回复
+ * 
+ * 向后端发送用户消息，获取AI的回复。如果获取失败，则使用模拟回复。
  */
-export const getAIResponse = async (semoUserId: string, message: string, topicId: number) => {
+export const getAIResponse = async (semoUserId: string, message: string) => {
   if (useMock) {
     return mockGetAIResponse(message); // 如果使用模拟模式，返回模拟的AI回复
   }
 
   try {
-    const response = await axios.post(`${BASE_URL}/api/semo/v1/user/${semoUserId}/chat`, {
-      user_input: message,
-      topic_id: topicId // 添加 topic_id
+    const response = await axios.post(`${BASE_URL}/api/semo/v1/chat`, 
+    { user_input: message },
+    {
+      params: {
+        semo_user_id: semoUserId // 确保将 userId 作为查询参数传递
+      }
     });
     console.log("Response from backend:", response.data); // 输出后端返回的完整数据
     return response.data; // 返回完整的响应数据
@@ -83,6 +94,8 @@ export const getAIResponse = async (semoUserId: string, message: string, topicId
 
 /**
  * 获取情绪报告
+ * 
+ * 向后端请求情绪报告。如果获取失败，则使用模拟报告数据。
  */
 export const getReport = async (semoUserId: string) => {
   if (useMock) {
@@ -90,7 +103,11 @@ export const getReport = async (semoUserId: string) => {
   }
 
   try {
-    const response = await axios.get(`${BASE_URL}/api/semo/v1/user/${semoUserId}/report`); // 将 userId 添加到 URL 路径中
+    const response = await axios.get(`${BASE_URL}/api/semo/v1/get_report`, {
+      params: {
+        semo_user_id: semoUserId,
+      },
+    });
     return response.data;
   } catch (error) {
     console.error('Failed to get report:', error);
@@ -99,7 +116,13 @@ export const getReport = async (semoUserId: string) => {
   }
 };
 
-/* 模拟函数部分（保持不变） */
+/* 模拟函数部分 */
+
+/**
+ * 模拟获取情绪报告
+ * 
+ * 返回模拟的情绪报告，包括摘要、建议和情绪列表。
+ */
 const mockGetReport = async () => {
   console.log('Simulated report retrieval');
   return new Promise((resolve) =>
@@ -111,17 +134,32 @@ const mockGetReport = async () => {
   );
 };
 
+/**
+ * 模拟生成用户ID
+ * 
+ * 返回一个随机生成的模拟用户ID。
+ */
 const mockGenerateUserId = async () => {
   return new Promise((resolve) =>
     setTimeout(() => resolve(`mock_user_id_${Math.floor(Math.random() * 10000)}`), 500)
   );
 };
 
+/**
+ * 模拟发送问卷数据
+ * 
+ * 模拟发送问卷数据并返回成功状态。
+ */
 const mockSendQuestionnaireData = async (data: QuestionnaireData) => {
   console.log('Simulated send questionnaire data:', data);
   return new Promise((resolve) => setTimeout(() => resolve({ status: 'success' }), 1000));
 };
 
+/**
+ * 模拟获取AI回复
+ * 
+ * 根据用户消息返回模拟的AI回复和情绪预测。
+ */
 const mockGetAIResponse = async (message: string) => {
   console.log('Simulated AI response for message:', message);
   return new Promise((resolve) =>

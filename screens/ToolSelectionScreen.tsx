@@ -1,3 +1,4 @@
+// /Users/bailangcheng/Desktop/semo/screens/ToolSelectionScreen.tsx
 import React, { useRef, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Dimensions, Alert, Animated } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context'; 
@@ -10,7 +11,12 @@ export default function ToolSelectionScreen({ navigation }) {
   const [activeIndex, setActiveIndex] = useState(0);
 
   const handleCardPress = (healingMethod) => {
-    navigation.navigate(healingMethod);
+    if (healingMethod === 'ChatScreen') {
+      // 如果选择的是对话疗愈，则导航到疗愈师风格选择页面
+      navigation.navigate('TherapistSettingScreen');
+    } else {
+      navigation.navigate(healingMethod); // 导航到其他疗愈工具
+    }
   };
 
   const handleScroll = (event) => {

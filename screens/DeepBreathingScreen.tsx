@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Dimensions, Animated } from 'react-native';
 import { Button } from 'react-native-elements';
+import { colors } from '../styles/color';
 
 const { width } = Dimensions.get('window');
 
-export default function MeditationScreen({ navigation }) { // 添加 navigation 用于跳转
-  const [scaleAnim] = useState(new Animated.Value(1));
+export default function DeepBreathingScreen({ navigation }) { // 添加 navigation 用于跳转
+  const [scaleAnim] = useState(new Animated.Value(1));  
 
   useEffect(() => {
     const breathingAnimation = Animated.loop(

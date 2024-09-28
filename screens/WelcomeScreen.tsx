@@ -3,8 +3,9 @@ import { View, Text, Image, StyleSheet, Button, Alert } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../App';
 import { checkBackendConnection, generateUserId } from '../service/api';
-import { useDispatch } from 'react-redux';  // 引入 useDispatch
-import { updateUserId } from '../redux/slices/userSlice';  // 引入 action 来更新 userId
+import { useDispatch } from 'react-redux';
+import { updateUserId } from '../redux/slices/userSlice';
+import { colors } from '../styles/color';
 
 type WelcomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Welcome'>;
 
@@ -80,7 +81,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#f06262',
+    color: colors.primary,
     marginBottom: 10,
   },
   subtitle: {
@@ -90,7 +91,7 @@ const styles = StyleSheet.create({
   },
   connectionStatus: {
     fontSize: 16,
-    color: '#f06262',
+    color: colors.primary,
     marginBottom: 20,
   },
   testButtonContainer: {

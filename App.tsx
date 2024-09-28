@@ -19,6 +19,7 @@ import QuestionFinalScreen from './screens/QuestionFinalScreen';
 import ChatScreen from './screens/ChatScreen';
 import AiChatReportScreen from './screens/AiChatReportScreen';
 import ToolSelectionScreen from './screens/ToolSelectionScreen'; // 新增情绪疗愈选择页面
+import TherapistSettingScreen from './screens/TherapistSettingScreen'; // 新增疗愈师风格页面
 import { Icon } from 'react-native-elements';
 import 'regenerator-runtime/runtime';
 
@@ -36,7 +37,8 @@ export type RootStackParamList = {
   MeditationScreen: undefined;
   DeepbreathingScreen: undefined;
   AiChatReportScreen: { userId: string; questionnaireData: any }; 
-  ToolSelectionScreen: { userId: string; questionnaireData: any }; // 添加情绪疗愈选择页面
+  ToolSelectionScreen: { userId: string; questionnaireData: any }; 
+  TherapistSettingScreen: undefined; // 添加疗愈师风格选择页面
 };
 
 export default function App() {
@@ -111,13 +113,18 @@ export default function App() {
             />
             <Stack.Screen
               name="DeepBreathing"
-              component={DeepBreathingScreen} // 确认你有 DeepBreathingScreen
+              component={DeepBreathingScreen}
               options={{ headerTitle: '深呼吸练习' }}
             />
             <Stack.Screen
-              name="ToolSelectionScreen" // 添加到导航栈
+              name="ToolSelectionScreen"
               component={ToolSelectionScreen}
               options={{ headerTitle: "情绪疗愈选择" }}
+            />
+            <Stack.Screen
+              name="TherapistSettingScreen" // 注册疗愈师风格选择页面
+              component={TherapistSettingScreen}
+              options={{ headerTitle: "选择疗愈师风格" }} // 自定义标题
             />
           </Stack.Navigator>
         </View>

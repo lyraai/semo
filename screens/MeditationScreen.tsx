@@ -1,41 +1,78 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, StyleSheet, Dimensions, Animated } from 'react-native';
 import { Button } from 'react-native-elements';
 import { colors } from '../styles/color';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
-export default function MeditationScreen({ navigation }) { // 添加 navigation 用于跳转
-  const [scaleAnim] = useState(new Animated.Value(1));
+export default function MeditationScreen({ navigation }) {
+  const [waveAnimation] = useState(new Animated.Value(0));
+  const waveRef = useRef(null);
 
   useEffect(() => {
-    const breathingAnimation = Animated.loop(
-      Animated.sequence([
-        Animated.timing(scaleAnim, {
-          toValue: 1.5, // 扩大
-          duration: 4000, // 吸气时间
-          useNativeDriver: true,
-        }),
-        Animated.timing(scaleAnim, {
-          toValue: 1, // 收缩
-          duration: 4000, // 呼气时间
-          useNativeDriver: true,
-        }),
-      ])
-    );
-    breathingAnimation.start();
+    Animated.loop(
+      Animated.timing(waveAnimation, {
+        toValue: 1,
+        duration: 5000,
+        useNativeDriver: true,
+      })
+    ).start();
 
-    return () => breathingAnimation.stop(); // 停止动画在组件卸载时
+    return () => waveAnimation.stopAnimation();
   }, []);
+
+  const getWavePoints = (amplitude, frequency) => {
+    const points = [];
+    for (let x = 0; x <= width + 10; x += 5) {
+      const y = amplitude * Math.sin((x / width) * frequency * Math.PI);
+      points.push({ x, y });
+    }
+    return points;
+  };
+
+  const animatedWave = waveAnimation.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, Math.PI * 2],
+  });
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Focus on your breath</Text>
-      <Animated.View style={[styles.breathingCircle, { transform: [{ scale: scaleAnim }] }]} />
+      <View style={styles.waveContainer}>
+        <Animated.View
+          ref={waveRef}
+          style={[
+            styles.wave,
+            {
+              transform: [
+                {
+                  translateY: animatedWave.interpolate({
+                    inputRange: [0, Math.PI, Math.PI * 2],
+                    outputRange: [0, -30, 0],
+                  }),
+                },
+              ],
+            },
+          ]}
+        >
+          {getWavePoints(20, 3).map((point, index) => (
+            <View
+              key={index}
+              style={[
+                styles.wavePoint,
+                {
+                  left: point.x,
+                  top: point.y + height / 2,
+                },
+              ]}
+            />
+          ))}
+        </Animated.View>
+      </View>
       <Button 
         title="开始冥想" 
         buttonStyle={styles.button} 
-        onPress={() => navigation.goBack()} // 示例按钮返回上一页
+        onPress={() => navigation.goBack()}
       />
     </View>
   );
@@ -63,5 +100,23 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: '#4CAF50',
     width: 200,
+  },
+  waveContainer: {
+    width: width,
+    height: height / 2,
+    overflow: 'hidden',
+    backgroundColor: 'rgba(129, 199, 132, 0.2)',
+  },
+  wave: {
+    position: 'absolute',
+    width: width + 10,
+    height: height / 2,
+  },
+  wavePoint: {
+    position: 'absolute',
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#81c784',
   },
 });

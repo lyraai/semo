@@ -1,5 +1,5 @@
 git add .
-git commit -m "API tested updated "
+git commit -m "UI updated "
 git push
 
 rm -rf .next

@@ -9,7 +9,7 @@ import {
   ScrollView,
   ActivityIndicator,
 } from 'react-native';
-import { getAIResponse, checkBackendConnection, useMock} from '../service/api'; // 引入 checkBackendConnection
+import { getAIResponse, checkBackendConnection, useMock } from '../service/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -21,13 +21,13 @@ export default function ChatScreen() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState<string>('');
   const [semoUserId, setSemoUserId] = useState<string | null>(null);
+  const [topicId, setTopicId] = useState<number | null>(null); // 新增 topicId 状态
   const [emotion, setEmotion] = useState<number | null>(null);
   const [predictedOptions, setPredictedOptions] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const navigation = useNavigation();
   const scrollViewRef = useRef<ScrollView | null>(null);
 
-  // 检查后端连接并判断是否进入模拟模式
   useEffect(() => {
     const initializeConnection = async () => {
       await checkBackendConnection();
@@ -40,7 +40,6 @@ export default function ChatScreen() {
     initializeConnection();
   }, []);
 
-  // 获取存储的用户 ID
   useEffect(() => {
     const fetchUserId = async () => {
       try {
@@ -58,7 +57,6 @@ export default function ChatScreen() {
     fetchUserId();
   }, []);
 
-  // 消息发送后自动滚动到底部
   useEffect(() => {
     scrollViewRef.current?.scrollToEnd({ animated: true });
   }, [messages]);
@@ -69,13 +67,19 @@ export default function ChatScreen() {
       setMessages(newMessages);
       setInputText('');
       setLoading(true);
-  
+
       try {
-        const { response, emotion, predicted_options } = await getAIResponse(semoUserId, inputText);
-        console.log("AI Response from backend:", response); // 添加日志以查看返回的AI响应
+        // 发送消息时附加 topicId
+        const { response, emotion, predicted_options, topic_id } = await getAIResponse(semoUserId, inputText, topicId);
+        console.log("AI Response from backend:", response);
         setMessages([...newMessages, { sender: 'ai', text: response }]);
         setEmotion(emotion);
         setPredictedOptions(predicted_options);
+
+        // 保存 topic_id
+        if (topic_id !== undefined) {
+          setTopicId(topic_id);
+        }
       } catch (error) {
         console.error('Failed to get AI response:', error);
       } finally {

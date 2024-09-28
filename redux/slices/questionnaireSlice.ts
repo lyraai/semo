@@ -25,9 +25,12 @@ const questionnaireSlice = createSlice({
   name: 'questionnaire',
   initialState,
   reducers: {
-    updateAnswer: (state, action: PayloadAction<{ question: keyof QuestionnaireData, answer: any }>) => {
+    updateAnswer: (
+      state,
+      action: PayloadAction<{ question: keyof QuestionnaireData; answer: string | number }>
+    ) => {
       const { question, answer } = action.payload;
-      state[question] = answer;
+      (state[question] as typeof answer) = answer;
     },
   },
 });
