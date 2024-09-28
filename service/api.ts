@@ -50,7 +50,7 @@ export const sendQuestionnaireData = async (semoUserId: string, data: Questionna
   }
 
   try {
-    const response = await axios.post(`${BASE_URL}/api/semo/v1/user/${semoUserId}/basic_info`, data); // 将 userId 添加到 URL 路径中
+    const response = await axios.post(`${BASE_URL}/api/semo/v1/user/${semoUserId}/initialise`, data); // 将 userId 添加到 URL 路径中
     return response.data;
   } catch (error) {
     console.error('Failed to send questionnaire data:', error);
@@ -62,22 +62,22 @@ export const sendQuestionnaireData = async (semoUserId: string, data: Questionna
 /**
  * 获取AI对话回复
  */
-export const getAIResponse = async (semoUserId: string, message: string, topicId: number) => {
+export const getAIResponse = async (semoUserId: string, message: string, topicId: number | null) => {
   if (useMock) {
-    return mockGetAIResponse(message); // 如果使用模拟模式，返回模拟的AI回复
+    return mockGetAIResponse(message);
   }
 
   try {
-    const response = await axios.post(`${BASE_URL}/api/semo/v1/user/${semoUserId}/chat`, {
+    const response = await axios.post(`${BASE_URL}/api/semo/v1/user/${semoUserId}/chat`, { 
       user_input: message,
-      topic_id: topicId // 添加 topic_id
+      topic_id: topicId // 将 topic_id 发送到后端
     });
-    console.log("Response from backend:", response.data); // 输出后端返回的完整数据
-    return response.data; // 返回完整的响应数据
+    console.log("Response from backend:", response.data);
+    return response.data; // 返回完整的响应数据，包括 topic_id
   } catch (error) {
     console.error('Failed to get AI response:', error);
-    useMock = true; // 失败后切换为模拟模式
-    return mockGetAIResponse(message); // 返回模拟的AI回复
+    useMock = true;
+    return mockGetAIResponse(message);
   }
 };
 

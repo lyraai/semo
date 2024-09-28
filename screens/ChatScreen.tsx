@@ -1,4 +1,4 @@
-// // /Users/bailangcheng/Desktop/semo/screens/ChatScreen.tsx
+// /Users/bailangcheng/Desktop/semo/screens/ChatScreen.tsx
 import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { getAIResponse, checkBackendConnection, useMock } from '../service/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../styles/color';
 
@@ -26,8 +26,10 @@ export default function ChatScreen() {
   const [predictedOptions, setPredictedOptions] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const navigation = useNavigation();
+  const route = useRoute(); // 用于获取导航传递的参数
   const scrollViewRef = useRef<ScrollView | null>(null);
 
+  // 初始化后端连接
   useEffect(() => {
     const initializeConnection = async () => {
       await checkBackendConnection();
@@ -40,6 +42,7 @@ export default function ChatScreen() {
     initializeConnection();
   }, []);
 
+  // 获取存储的 User ID
   useEffect(() => {
     const fetchUserId = async () => {
       try {
@@ -57,6 +60,27 @@ export default function ChatScreen() {
     fetchUserId();
   }, []);
 
+  // 接收从 TherapistSettingScreen 传递过来的初始消息、选项和 topicId
+  useEffect(() => {
+    const { initialMessage, initialOptions, initialTopicId } = route.params || {};
+
+    // 设置初始消息
+    if (initialMessage) {
+      setMessages([{ sender: 'ai', text: initialMessage }]);
+    }
+
+    // 设置初始选项
+    if (initialOptions) {
+      setPredictedOptions(initialOptions);
+    }
+
+    // 设置初始 topicId
+    if (initialTopicId !== undefined) {
+      setTopicId(initialTopicId);
+    }
+  }, [route.params]);
+
+  // 确保滚动视图自动滚动到末尾
   useEffect(() => {
     scrollViewRef.current?.scrollToEnd({ animated: true });
   }, [messages]);
@@ -67,16 +91,26 @@ export default function ChatScreen() {
       setMessages(newMessages);
       setInputText('');
       setLoading(true);
-
+  
       try {
-        // 发送消息时附加 topicId
-        const { response, emotion, predicted_options, topic_id } = await getAIResponse(semoUserId, inputText, topicId);
-        console.log("AI Response from backend:", response);
-        setMessages([...newMessages, { sender: 'ai', text: response }]);
+        // 打印发送到后端的数据
+        console.log("Sending message to backend:", {
+          user_input: inputText,
+          topic_id: topicId
+        });
+  
+        // 调用API，获取AI回复
+        const { content, emotion, predicted_options, topic_id } = await getAIResponse(semoUserId, inputText, topicId);
+  
+        // 打印从后端接收到的完整响应
+        console.log("AI Response from backend:", { content, emotion, predicted_options, topic_id });
+  
+        // 更新消息和其他状态
+        setMessages([...newMessages, { sender: 'ai', text: content }]);
         setEmotion(emotion);
         setPredictedOptions(predicted_options);
-
-        // 保存 topic_id
+  
+        // 保存返回的 topic_id
         if (topic_id !== undefined) {
           setTopicId(topic_id);
         }
@@ -94,6 +128,7 @@ export default function ChatScreen() {
     setInputText(option);
   };
 
+  // 根据情绪值设置颜色
   const getEmotionColor = (emotionValue: number | null) => {
     if (emotionValue === null) return '#ddd';
     if (emotionValue > 0.75) return '#FF6347';

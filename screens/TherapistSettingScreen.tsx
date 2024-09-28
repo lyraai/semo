@@ -1,4 +1,3 @@
-// /Users/bailangcheng/Desktop/semo/screens/TherapistSettingScreen.tsx
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
@@ -6,6 +5,7 @@ import { updateAnswer } from '../redux/slices/questionnaireSlice';
 import { sendQuestionnaireData } from '../service/api'; // 导入发送问卷数据的API
 import { useNavigation } from '@react-navigation/native';
 import { RootState } from '../redux/store';
+import { colors } from '../styles/color';
 
 export default function TherapistSettingScreen() {
   const [selectedStyle, setSelectedStyle] = useState<string>('');
@@ -24,11 +24,19 @@ export default function TherapistSettingScreen() {
       console.error('User ID is missing.');
       return;
     }
-
+  
     // 发送完整的问卷数据到后端
     try {
-      await sendQuestionnaireData(userId, questionnaireData);
-      navigation.navigate('ChatScreen'); // 进入AI对话
+      const response = await sendQuestionnaireData(userId, questionnaireData);
+  
+      console.log('API Response:', response);
+      
+      // 将 response 的内容传递到 ChatScreen
+      navigation.navigate('ChatScreen', {
+        initialMessage: response.content, 
+        initialOptions: response.predicted_options, 
+        initialTopicId: response.topic_id,
+      });
     } catch (error) {
       console.error('Failed to send questionnaire data:', error);
     }
@@ -83,14 +91,14 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   selectedButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: colors.primary,
   },
   buttonText: {
     color: '#fff',
     fontSize: 18,
   },
   confirmButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: colors.primary,
     padding: 15,
     borderRadius: 30,
     width: '80%',
