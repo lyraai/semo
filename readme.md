@@ -1,3 +1,6 @@
+## 简介
+这是一个基于 Expo 和 Next.js 构建的跨平台应用，支持移动端和 Web 端开发。该应用使用 Redux 来管理状态，Axios 处理 API 请求，React Navigation 处理页面路由。
+
 ## 安装指南
 
 ### 1. 环境要求
@@ -5,6 +8,7 @@
 - **Node.js**：版本 >= 16.x（兼容 Expo 和 Next.js）
 - **Yarn**：建议使用 Yarn 来管理依赖。
 - **Expo CLI**：可以使用 `npx expo` 来启动 Expo 开发环境。
+- **Xcode**（仅限 iOS 开发）：如果你计划在 iOS 设备上进行开发，需要安装 [Xcode]
 
 ### 2. 安装步骤
 
@@ -42,12 +46,6 @@ NEXT_PUBLIC_API_URL=https://your-backend-url
 npx expo start
 ```
 
-如果需要启动 Web 端开发服务器，可以运行以下命令：
-
-```bash
-# 启动 Web 端开发环境（Next.js）
-yarn dev
-```
 
 ### 3. 构建和生产部署
 
