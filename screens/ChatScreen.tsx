@@ -11,11 +11,17 @@ import {
 } from 'react-native';
 import { getAIResponse, checkBackendConnection, useMock } from '../service/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../styles/color';
 
 type Message = { sender: 'user' | 'ai'; text: string };
+
+type Params = {
+  initialMessage: string;
+  initialOptions: string[];
+  initialTopicId: number;
+};
 
 export default function ChatScreen() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -26,7 +32,7 @@ export default function ChatScreen() {
   const [predictedOptions, setPredictedOptions] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const navigation = useNavigation();
-  const route = useRoute(); // 用于获取导航传递的参数
+  const route = useRoute<RouteProp<{ params: Params }, 'params'>>();
   const scrollViewRef = useRef<ScrollView | null>(null);
 
   // 初始化后端连接
@@ -93,26 +99,27 @@ export default function ChatScreen() {
       setLoading(true);
   
       try {
-        // 打印发送到后端的数据
-        console.log("Sending message to backend:", {
+        // 在发送之前，打印要发送的消息和 topicId
+        console.log(`Sending message to backend:`, {
           user_input: inputText,
           topic_id: topicId
         });
   
-        // 调用API，获取AI回复
-        const { content, emotion, predicted_options, topic_id } = await getAIResponse(semoUserId, inputText, topicId);
+        // 发送消息时附加 topicId
+        const response = await getAIResponse(semoUserId, inputText, topicId);
   
         // 打印从后端接收到的完整响应
-        console.log("AI Response from backend:", { content, emotion, predicted_options, topic_id });
+        console.log("AI Response from backend:", response);
   
         // 更新消息和其他状态
-        setMessages([...newMessages, { sender: 'ai', text: content }]);
-        setEmotion(emotion);
-        setPredictedOptions(predicted_options);
+        setMessages([...newMessages, { sender: 'ai', text: response.content }]);
+        setEmotion(response.emotion);
+        setPredictedOptions(response.predicted_options);
   
-        // 保存返回的 topic_id
-        if (topic_id !== undefined) {
-          setTopicId(topic_id);
+        // 保存 topic_id
+        if (response.topic_id !== undefined) {
+          setTopicId(response.topic_id);
+          console.log(`Updated topic_id: ${response.topic_id}`);
         }
       } catch (error) {
         console.error('Failed to get AI response:', error);

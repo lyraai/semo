@@ -7,12 +7,21 @@ import { useNavigation } from '@react-navigation/native';
 import { RootState } from '../redux/store';
 import { colors } from '../styles/color';
 
+// 定义导航参数的类型
+type RootStackParamList = {
+  ChatScreen: {
+    initialMessage: string;
+    initialOptions: string[];
+    initialTopicId: number;
+  };
+};
+
 export default function TherapistSettingScreen() {
   const [selectedStyle, setSelectedStyle] = useState<string>('');
   const questionnaireData = useSelector((state: RootState) => state.questionnaire);
   const userId = useSelector((state: RootState) => state.user.userId);
   const dispatch = useDispatch();
-  const navigation = useNavigation();
+  const navigation = useNavigation(); // 使用 useNavigation 钩子
 
   const handleStyleSelect = (style: string) => {
     setSelectedStyle(style);
@@ -24,11 +33,11 @@ export default function TherapistSettingScreen() {
       console.error('User ID is missing.');
       return;
     }
-  
-    // 发送完整的问卷数据到后端
+
     try {
+      // 发送完整的问卷数据到后端
       const response = await sendQuestionnaireData(userId, questionnaireData);
-  
+
       console.log('API Response:', response);
       
       // 将 response 的内容传递到 ChatScreen
