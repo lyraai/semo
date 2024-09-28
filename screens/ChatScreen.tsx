@@ -93,6 +93,9 @@ export default function ChatScreen() {
 
   const sendMessage = async () => {
     if (inputText.trim() !== '' && semoUserId) {
+      // 在发送前，打印 semoUserId 以确保它存在
+      console.log('User ID being sent:', semoUserId);
+  
       const newMessages: Message[] = [...messages, { sender: 'user', text: inputText }];
       setMessages(newMessages);
       setInputText('');
@@ -105,7 +108,6 @@ export default function ChatScreen() {
           topic_id: topicId
         });
   
-        // 发送消息时附加 topicId
         const response = await getAIResponse(semoUserId, inputText, topicId);
   
         // 打印从后端接收到的完整响应
