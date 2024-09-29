@@ -4,6 +4,8 @@ import { Icon } from 'react-native-elements';
 import { LineChart, Grid, XAxis, YAxis } from 'react-native-svg-charts';
 import { colors } from '../styles/color';
 import { getReport } from '../service/api'; // 引入后端 API 获取报告数据
+import { useSelector } from 'react-redux';
+import { RootState } from '../redux/store';
 
 interface ErrorBoundaryProps {
   children: React.ReactNode;
@@ -29,13 +31,14 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps> {
 }
 
 export default function AiChatReportScreen({ route }) {
-  const [reportData, setReportData] = useState<any>(null); // 用于存储后端返回的数据
+  const [reportData, setReportData] = useState<any>(null); // 于存储后端返回的数据
   const [loading, setLoading] = useState<boolean>(true);
+  const userId = useSelector((state: RootState) => state.user.userId);// 从 Redux 获取 userId
+  console.log("current user id", userId); 
 
   useEffect(() => {
     const fetchReport = async () => {
       try {
-        const userId = route.params?.userId; // 从路由参数获取用户ID
         const report = await getReport(userId); // 调用API获取报告
         console.log("Report data received from backend:", report); // Console 中显示后端返回的数据
         setReportData(report);
@@ -47,7 +50,7 @@ export default function AiChatReportScreen({ route }) {
     };
     
     fetchReport();
-  }, [route.params?.userId]);
+  }, [userId]);
 
   if (loading) {
     return (
@@ -66,7 +69,11 @@ export default function AiChatReportScreen({ route }) {
     );
   }
 
-  const { summary, recommendations = [], emotion_list = [] } = reportData || {};
+  const summary = reportData?.summary ?? '暂无摘要';
+  const recommendations = Array.isArray(reportData?.recommendations) ? reportData.recommendations : [];
+  const emotion_list = Array.isArray(reportData?.emotion_list) ? reportData.emotion_list : [];
+  
+  console.log("Summary:", summary); // 保留这行调试输出
 
   return (
     <ErrorBoundary>
@@ -86,53 +93,63 @@ export default function AiChatReportScreen({ route }) {
           </View>
         </View>
 
+        {/* 摘要部分 */}
         <View style={styles.summaryContainer}>
-          <Text style={styles.chartTitle}>情绪报告摘要</Text>
-          <Text style={styles.feedbackText}>{summary || '暂无摘要'}</Text>
+          <Text style={styles.sectionTitle}>情绪报告摘要</Text>
+          <Text style={styles.summaryText}>{summary}</Text>
         </View>
 
+        {/* 添加建议部分 */}
         {recommendations.length > 0 && (
-          <View style={styles.feedbackContainer}>
+          <View style={styles.recommendationsContainer}>
+            <Text style={styles.sectionTitle}>建议</Text>
             {recommendations.map((rec, index) => (
-              <Text key={index} style={styles.feedbackText}>建议: {rec}</Text>
+              <Text key={index} style={styles.recommendationText}>• {rec}</Text>
             ))}
           </View>
         )}
 
-        {emotion_list.length > 0 ? (
-          <View style={styles.chartContainer}>
-            <Text style={styles.chartTitle}>情绪变化图</Text>
+        <View style={styles.recommendationsContainer}>
+          <Text style={styles.sectionTitle}>建议</Text>
+          {recommendations.map((rec, index) => (
+              <Text key={index} style={styles.recommendationText}>• {rec}</Text>
+            ))}
+        </View>
+
+        {/* 情绪图表部分 */}
+        <View style={styles.chartContainer}>
+          <Text style={styles.sectionTitle}>情绪变化图</Text>
+          {emotion_list.length > 0 ? (
             <View style={{ height: 200, flexDirection: 'row' }}>
               <YAxis
                 data={emotion_list}
                 contentInset={{ top: 20, bottom: 20 }}
-                svg={{ fontSize: 12, fill: colors.textGrey800 }}
+                svg={{ fontSize: 10, fill: colors.textGrey800 }}
+                numberOfTicks={5}
+                formatLabel={(value) => `${value}`}
               />
-              <LineChart
-                style={styles.chart}
-                data={emotion_list}
-                svg={{
-                  stroke: colors.primary,
-                  strokeWidth: 3,
-                }}
-                contentInset={{ top: 20, bottom: 20 }}
-              >
-                <Grid />
-              </LineChart>
+              <View style={{ flex: 1, marginLeft: 10 }}>
+                <LineChart
+                  style={{ flex: 1 }}
+                  data={emotion_list}
+                  svg={{ stroke: colors.primary, strokeWidth: 3 }}
+                  contentInset={{ top: 20, bottom: 20, left: 10, right: 10 }}
+                >
+                  <Grid />
+                </LineChart>
+                <XAxis
+                  style={{ marginHorizontal: -10 }}
+                  data={emotion_list}
+                  formatLabel={(value, index) => `${index + 1}`}
+                  contentInset={{ left: 10, right: 10 }}
+                  svg={{ fontSize: 10, fill: colors.textGrey800 }}
+                />
+              </View>
             </View>
-            <XAxis
-              style={{ marginHorizontal: -10, marginTop: 10 }}
-              data={emotion_list}
-              formatLabel={(value, index) => `点${index + 1}`}
-              contentInset={{ left: 30, right: 30 }}
-              svg={{ fontSize: 12, fill: colors.textGrey800 }}
-            />
-          </View>
-        ) : (
-          <View style={styles.chartContainer}>
-            <Text style={styles.chartTitle}>暂无情绪变化数据</Text>
-          </View>
-        )}
+          ) : (
+            <Text style={styles.noDataText}>暂无情绪变化数据</Text>
+          )}
+        </View>
 
         <View style={styles.footer}>
           <TouchableOpacity style={styles.footerButton}>
@@ -178,47 +195,67 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     paddingVertical: 20,
-    backgroundColor: colors.textPrimary,
+    backgroundColor: colors.textPrimary, // 确保这个颜色与背景形成对比
     marginBottom: 10,
+    width: '100%', // 确保容器占满宽度
+    borderWidth: 1, // 添加边框以便于调试
+    borderColor: 'red',
   },
   infoBlock: {
     alignItems: 'center',
+    flex: 1, // 使每个块平均分配空间
+    borderWidth: 1, // 添加边框以便于调试
+    borderColor: 'blue',
   },
   infoLabel: {
-    color: colors.textGrey800,
+    color: 'black', // 改为明确的颜色
     fontSize: 14,
     marginBottom: 5,
+    fontWeight: 'bold', // 加粗以便更容易看到
   },
   infoValue: {
     fontSize: 16,
-    color: colors.textBlack,
+    color: 'blue', // 使用明显的颜色
     fontWeight: 'bold',
   },
   summaryContainer: {
-    padding: 20,
+    padding: 15,
+    backgroundColor: '#f0f0f0', // 使用明显的背景色
+    marginVertical: 10,
+    borderWidth: 1,
+    borderColor: 'red',
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: 'black',
+    marginBottom: 10,
+  },
+  summaryText: {
+    fontSize: 14,
+    color: 'black',
+    lineHeight: 20,
+  },
+  recommendationsContainer: {
+    padding: 15,
     backgroundColor: colors.textPrimary,
     marginBottom: 10,
   },
-  feedbackContainer: {
-    padding: 20,
-    backgroundColor: colors.textPrimary,
-    marginBottom: 10,
-  },
-  feedbackText: {
+  recommendationText: {
     fontSize: 14,
     color: colors.textBlack,
-    marginBottom: 10,
+    marginBottom: 5,
   },
   chartContainer: {
-    padding: 20,
+    padding: 15,
     backgroundColor: colors.textPrimary,
     marginBottom: 10,
   },
-  chartTitle: {
-    fontSize: 16,
-    color: colors.textBlack,
-    fontWeight: 'bold',
-    marginBottom: 10,
+  noDataText: {
+    fontSize: 14,
+    color: colors.textGrey800,
+    textAlign: 'center',
+    marginTop: 20,
   },
   footer: {
     flexDirection: 'row',

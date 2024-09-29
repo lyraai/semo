@@ -1,5 +1,8 @@
 // /Users/bailangcheng/Desktop/semo/screens/ChatScreen.tsx
 import React, { useState, useEffect, useRef } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState } from '../redux/store';
+import { updateUserId } from '../redux/slices/userSlice';
 import {
   View,
   TextInput,
@@ -26,8 +29,8 @@ type Params = {
 export default function ChatScreen() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState<string>('');
-  const [semoUserId, setSemoUserId] = useState<string | null>(null);
-  const [topicId, setTopicId] = useState<number | null>(null); // 新增 topicId 状态
+  // 移除 semoUserId 的 useState
+  const [topicId, setTopicId] = useState<number | null>(null);
   const [emotion, setEmotion] = useState<number | null>(null);
   const [predictedOptions, setPredictedOptions] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -35,36 +38,31 @@ export default function ChatScreen() {
   const route = useRoute<RouteProp<{ params: Params }, 'params'>>();
   const scrollViewRef = useRef<ScrollView | null>(null);
 
-  // 初始化后端连接
-  useEffect(() => {
-    const initializeConnection = async () => {
-      await checkBackendConnection();
-      if (useMock) {
-        console.log("Running in mock mode");
-      } else {
-        console.log("Connected to backend");
-      }
-    };
-    initializeConnection();
-  }, []);
+  // 从 Redux 获取 semoUserId
+  const semoUserId = useSelector((state: RootState) => state.user.userId);
+  const dispatch = useDispatch();
 
-  // 获取存储的 User ID
+  useEffect(() => {
+    console.log('Current semoUserId in ChatScreen:', semoUserId);
+  }, [semoUserId]);
+
+  // 如果需要，您可以在这里添加一个 effect 来从 AsyncStorage 获取 userId
   useEffect(() => {
     const fetchUserId = async () => {
       try {
         const storedUserId = await AsyncStorage.getItem('semo_user_id');
-        if (storedUserId) {
-          setSemoUserId(storedUserId);
-        } else {
-          console.error('No User ID found in AsyncStorage');
+        if (storedUserId && storedUserId !== semoUserId) {
+          dispatch(updateUserId(storedUserId));
         }
       } catch (error) {
-        console.error('Failed to fetch user ID:', error);
+        console.error('Failed to fetch user ID from AsyncStorage:', error);
       }
     };
 
-    fetchUserId();
-  }, []);
+    if (!semoUserId) {
+      fetchUserId();
+    }
+  }, [semoUserId, dispatch]);
 
   // 接收从 TherapistSettingScreen 传递过来的初始消息、选项和 topicId
   useEffect(() => {
@@ -92,7 +90,13 @@ export default function ChatScreen() {
   }, [messages]);
 
   const sendMessage = async () => {
-    if (inputText.trim() !== '' && semoUserId) {
+    console.log('semoUserId in sendMessage:', semoUserId);
+    if (!semoUserId) {
+      console.error('No User ID available');
+      return;
+    }
+
+    if (inputText.trim() !== '') {
       // 在发送前，打印 semoUserId 以确保它存在
       console.log('User ID being sent:', semoUserId);
   
