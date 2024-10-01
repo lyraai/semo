@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet, Button, Alert } from 'react-native';
+import { View, Text, Image, StyleSheet, Button, Alert, Platform } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../App';
 import { checkBackendConnection, generateUserId } from '../service/api';
 import { useDispatch } from 'react-redux';
 import { updateUserId } from '../redux/slices/userSlice';
 import { colors } from '../styles/color';
+import Constants from 'expo-constants';
 
 type WelcomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Welcome'>;
 
@@ -40,12 +41,20 @@ export default function WelcomeScreen({ navigation }: Props) {
     }
   };
 
+  const version = Constants.expoConfig?.version || '未知';
+  const buildNumber = Platform.select({
+    ios: Constants.expoConfig?.ios?.buildNumber,
+    android: Constants.expoConfig?.android?.versionCode?.toString(),
+  }) || '未知';
+
+  console.log('Version:', version);
+  console.log('Build Number:', buildNumber);
+
   return (
     <View style={styles.container}>
       <Image source={require('../assets/logos/1x/logo.png')} style={styles.logo} />
       <Text style={styles.title}>欢迎来到Semo心茉</Text>
-      <Text style={styles.subtitle}>你的情绪急救助手</Text>
-
+      <Text style={styles.subtitle}>你的情绪急救助手 version: {version} (build: {buildNumber})</Text>
       {connectionStatus && (
         <Text style={styles.connectionStatus}>{connectionStatus}</Text>
       )}
@@ -60,7 +69,6 @@ export default function WelcomeScreen({ navigation }: Props) {
       <View style={styles.testButtonContainer}>
         <Button title="测试生成用户ID" onPress={handleGenerateUserId} color="#4CAF50" />
       </View>
-
     </View>
   );
 }
@@ -86,8 +94,8 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 18,
-    color: '#666',
-    marginBottom: 40,
+    color: '#666', // 确保这个颜色与背景形成对比
+    marginBottom: 10,
   },
   connectionStatus: {
     fontSize: 16,
@@ -101,5 +109,5 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontSize: 16,
     color: '#4CAF50',
-  },
+  }
 });
