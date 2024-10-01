@@ -1,9 +1,10 @@
+// /Users/bailangcheng/Desktop/dev/semo/screens/AiChatReportScreen.tsx
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, Image } from 'react-native';
 import { Icon } from 'react-native-elements';
-import { LineChart, Grid, XAxis, YAxis } from 'react-native-svg-charts';
+import { LineChart, Grid } from 'react-native-svg-charts';
 import { colors } from '../styles/color';
-import { getReport } from '../service/api'; // 引入后端 API 获取报告数据
+import { getReport } from '../service/api'; 
 import { useSelector } from 'react-redux';
 import { RootState } from '../redux/store';
 
@@ -72,12 +73,11 @@ export default function AiChatReportScreen({ route }) {
   const summary = reportData?.summary ?? '暂无摘要';
   const recommendations = Array.isArray(reportData?.recommendations) ? reportData.recommendations : [];
   const emotion_list = Array.isArray(reportData?.emotion_list) ? reportData.emotion_list : [];
-  
-  console.log("Summary:", summary); // 保留这行调试输出
 
   return (
     <ErrorBoundary>
       <ScrollView style={styles.container}>
+        {/* 第一部分：日期、时间和时长 */}
         <View style={styles.infoContainer}>
           <View style={styles.infoBlock}>
             <Text style={styles.infoLabel}>日期</Text>
@@ -93,57 +93,62 @@ export default function AiChatReportScreen({ route }) {
           </View>
         </View>
 
-        {/* 摘要部分 */}
-        <View style={styles.summaryContainer}>
-          <Text style={styles.sectionTitle}>情绪报告摘要</Text>
-          <Text style={styles.summaryText}>{summary}</Text>
-        </View>
-
-        {/* 添加建议部分 */}
-        {recommendations.length > 0 && (
-          <View style={styles.recommendationsContainer}>
-            <Text style={styles.sectionTitle}>建议</Text>
-            {recommendations.map((rec, index) => (
-              <Text key={index} style={styles.recommendationText}>• {rec}</Text>
-            ))}
+        {/* 第二部分：对话模式 */}
+        <View style={styles.modeContainer}>
+          <View style={styles.modeBox}>
+            <View style={styles.modeBlock}>
+              <Image source={require('../assets/icons/2x/Thinking Bubble.png')} style={styles.icon} />
+              <Text style={styles.modeText}>思念</Text>
+            </View>
+            <View style={styles.modeBlock}>
+              <Image source={require('../assets/icons/2x/Melting Heart.png')} style={styles.icon} />
+              <Text style={styles.modeText}>前任</Text>
+            </View>
+            <View style={styles.modeBlock}>
+              <Image source={require('../assets/icons/2x/Hand Holding Heart.png')} style={styles.icon} />
+              <Text style={styles.modeText}>温暖模式</Text>
+            </View>
           </View>
-        )}
-
-        <View style={styles.recommendationsContainer}>
-          <Text style={styles.sectionTitle}>建议</Text>
-          {recommendations.map((rec, index) => (
-              <Text key={index} style={styles.recommendationText}>• {rec}</Text>
-            ))}
         </View>
 
-        {/* 情绪图表部分 */}
+        {/* 第三部分：总结和建议 */}
+        <View style={styles.summaryContainer}>
+          <Text style={styles.sectionTitle}>Semo 总结</Text>
+          <Text style={styles.summaryText}>{summary}</Text>
+          {recommendations.length > 0 && (
+            <View style={styles.recommendationsContainer}>
+              {recommendations.map((rec, index) => (
+                <Text key={index} style={styles.recommendationText}>• {rec}</Text>
+              ))}
+            </View>
+          )}
+        </View>
+
+        {/* 第四部分：情绪变化图表 */}
         <View style={styles.chartContainer}>
-          <Text style={styles.sectionTitle}>情绪变化图</Text>
+          <Text style={styles.sectionTitle}>本次聊天中的情绪变化</Text>
           {emotion_list.length > 0 ? (
-            <View style={{ height: 200, flexDirection: 'row' }}>
-              <YAxis
-                data={emotion_list}
-                contentInset={{ top: 20, bottom: 20 }}
-                svg={{ fontSize: 10, fill: colors.textGrey800 }}
-                numberOfTicks={5}
-                formatLabel={(value) => `${value}`}
-              />
-              <View style={{ flex: 1, marginLeft: 10 }}>
+            <View style={{ height: 150, flexDirection: 'row', alignItems: 'center' }}>
+              {/* 左侧竖着显示悲伤到笑脸的图标 */}
+              <View style={styles.emotionIconsContainer}>
+                <Image source={require('../assets/icons/2x/Happy.png')} style={styles.emotionIcon} />
+                <Image source={require('../assets/icons/2x/Disappointed.png')} style={styles.emotionIcon} />
+              </View>
+              {/* 线条颜色变浅，线条宽度减少 */}
+              <View style={{ flex: 1, marginLeft: 15 }}>
                 <LineChart
                   style={{ flex: 1 }}
                   data={emotion_list}
-                  svg={{ stroke: colors.primary, strokeWidth: 3 }}
-                  contentInset={{ top: 20, bottom: 20, left: 10, right: 10 }}
+                  svg={{ stroke: colors.primary, strokeWidth: 3,strokeLinecap: 'round' }} 
+                  contentInset={{ top: 0, bottom: 0 }}
                 >
-                  <Grid />
+                  <Grid 
+                    svg={{ stroke: '#E0E0E0', strokeWidth: 1 }} 
+                    belowChart={true} 
+                    yTicks={3} 
+
+                  />
                 </LineChart>
-                <XAxis
-                  style={{ marginHorizontal: -10 }}
-                  data={emotion_list}
-                  formatLabel={(value, index) => `${index + 1}`}
-                  contentInset={{ left: 10, right: 10 }}
-                  svg={{ fontSize: 10, fill: colors.textGrey800 }}
-                />
               </View>
             </View>
           ) : (
@@ -151,6 +156,7 @@ export default function AiChatReportScreen({ route }) {
           )}
         </View>
 
+        {/* 底部操作栏 */}
         <View style={styles.footer}>
           <TouchableOpacity style={styles.footerButton}>
             <Icon name="history" type="material" color={colors.primary} />
@@ -168,9 +174,7 @@ export default function AiChatReportScreen({ route }) {
       </ScrollView>
     </ErrorBoundary>
   );
-}
-
-const styles = StyleSheet.create({
+}const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
@@ -191,77 +195,115 @@ const styles = StyleSheet.create({
     color: colors.primary,
     fontSize: 16,
   },
+
+  // 第一部分样式
   infoContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     paddingVertical: 20,
-    backgroundColor: colors.textPrimary, // 确保这个颜色与背景形成对比
-    marginBottom: 10,
-    width: '100%', // 确保容器占满宽度
-    borderWidth: 1, // 添加边框以便于调试
-    borderColor: 'red',
+    backgroundColor: '#ffffff', 
+    borderRadius: 20,
+    marginHorizontal: 20,
+    marginVertical: 5,
   },
   infoBlock: {
     alignItems: 'center',
-    flex: 1, // 使每个块平均分配空间
-    borderWidth: 1, // 添加边框以便于调试
-    borderColor: 'blue',
+    flex: 1,
   },
   infoLabel: {
-    color: 'black', // 改为明确的颜色
     fontSize: 14,
-    marginBottom: 5,
-    fontWeight: 'bold', // 加粗以便更容易看到
+    color: '#9E9E9E',  
   },
   infoValue: {
     fontSize: 16,
-    color: 'blue', // 使用明显的颜色
     fontWeight: 'bold',
+    color: '#333',  
   },
-  summaryContainer: {
+
+  // 第二部分样式
+  modeContainer: {
+    justifyContent: 'center',
+    backgroundColor: '#ffffff', 
+    borderRadius: 15,
     padding: 15,
-    backgroundColor: '#f0f0f0', // 使用明显的背景色
-    marginVertical: 10,
-    borderWidth: 1,
-    borderColor: 'red',
+    marginVertical: 5,
+    marginHorizontal: 20,
+  },
+  modeBox: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+  modeBlock: {
+    alignItems: 'center',
+  },
+  icon: {
+    width: 40,
+    height: 40,
+    marginBottom: 5,
+    tintColor: colors.primary, 
+  },
+  modeText: {
+    fontSize: 14,
+    color: '#9E9E9E', 
+  },
+
+  // 第三部分样式
+  summaryContainer: {
+    backgroundColor: '#ffffff', 
+    padding: 20,
+    borderRadius: 15,
+    marginHorizontal: 20,
+    marginVertical: 5,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
-    color: 'black',
+    color: '#333', 
     marginBottom: 10,
   },
   summaryText: {
     fontSize: 14,
-    color: 'black',
-    lineHeight: 20,
+    color: '#333',
+    lineHeight: 22,
   },
   recommendationsContainer: {
-    padding: 15,
-    backgroundColor: colors.textPrimary,
-    marginBottom: 10,
+    marginTop: 10,
   },
   recommendationText: {
     fontSize: 14,
-    color: colors.textBlack,
+    color: '#333',
     marginBottom: 5,
   },
+
+  // 第四部分样式
   chartContainer: {
-    padding: 15,
-    backgroundColor: colors.textPrimary,
-    marginBottom: 10,
+    padding: 20,
+    backgroundColor: '#ffffff',  
+    borderRadius: 15,
+    marginHorizontal: 20,
+    marginVertical: 10,
+  },
+  emotionIconsContainer: {
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  emotionIcon: {
+    width: 30,
+    height: 30,
   },
   noDataText: {
     fontSize: 14,
-    color: colors.textGrey800,
+    color: '#9E9E9E',
     textAlign: 'center',
     marginTop: 20,
   },
+
+  // 底部操作栏样式
   footer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    paddingVertical: 20,
-    backgroundColor: colors.textPrimary,
+    paddingVertical: 15,
+    backgroundColor: '#ffffff', 
   },
   footerButton: {
     alignItems: 'center',
@@ -270,9 +312,5 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.primary,
     marginTop: 5,
-  },
-  chart: {
-    flex: 1,
-    marginLeft: 16,
   },
 });
