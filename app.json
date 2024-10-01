@@ -39,6 +39,9 @@
     },
     "updates": {
       "url": "https://u.expo.dev/0a4c30a2-6ec3-42c1-91a3-0764390cc92c"
-    }
+    },
+    "plugins": [
+      "react-native-video"
+    ]
   }
 }

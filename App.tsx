@@ -1,7 +1,7 @@
-// /Users/bailangcheng/Desktop/semo/App.tsx
+// App.tsx
 import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+import { createStackNavigator, StackNavigationProp } from '@react-navigation/stack';
 import { View } from 'react-native';
 import { Provider } from 'react-redux';
 import { store } from './redux/store';
@@ -18,13 +18,13 @@ import DeepBreathingScreen from './screens/DeepBreathingScreen';
 import QuestionFinalScreen from './screens/QuestionFinalScreen';
 import ChatScreen from './screens/ChatScreen';
 import AiChatReportScreen from './screens/AiChatReportScreen';
-import ToolSelectionScreen from './screens/ToolSelectionScreen'; // 新增情绪疗愈选择页面
-import TherapistSettingScreen from './screens/TherapistSettingScreen'; // 新增疗愈师风格页面
-import { Icon } from 'react-native-elements';
+import ToolSelectionScreen from './screens/ToolSelectionScreen'; 
+import TherapistSettingScreen from './screens/TherapistSettingScreen'; 
+import DefaultHeader from './components/DefaultHeader';
+import CustomHeader from './components/CustomHeader';
 import 'regenerator-runtime/runtime';
 
-const Stack = createStackNavigator();
-
+// 定义 Stack 参数列表的类型
 export type RootStackParamList = {
   Welcome: undefined;
   Question0: undefined;
@@ -34,18 +34,23 @@ export type RootStackParamList = {
   Question4: undefined;
   FinalScreen: undefined;
   ChatScreen: undefined;
-  MeditationScreen: undefined;
+  Meditation: undefined;
   DeepbreathingScreen: undefined;
   AiChatReportScreen: { userId: string; questionnaireData: any }; 
   ToolSelectionScreen: { userId: string; questionnaireData: any }; 
-  TherapistSettingScreen: undefined; // 添加疗愈师风格选择页面
+  TherapistSettingScreen: undefined; 
 };
+
+// 获取 StackNavigationProp 的类型
+type ScreenNavigationProp = StackNavigationProp<RootStackParamList, keyof RootStackParamList>;
+
+const Stack = createStackNavigator<RootStackParamList>();
 
 export default function App() {
   useEffect(() => {
     const initializeUserId = async () => {
       try {
-        await checkBackendConnection(); // 检查后端连接性
+        await checkBackendConnection();
         const storedUserId = await AsyncStorage.getItem('semo_user_id');
         if (!storedUserId) {
           const newUserId = await generateUserId();
@@ -59,22 +64,14 @@ export default function App() {
     initializeUserId();
   }, []);
 
-  const defaultScreenOptions = ({ navigation }) => ({
-    headerLeft: () => (
-      <Icon
-        name="chevron-left"
-        type="feather"
-        color= '#E14D5A'
-        size={30}
-        onPress={() => navigation.goBack()}
-        containerStyle={{ marginLeft: 15 }}
-      />
-    ),
+  // 定义 screenOptions，使用 DefaultHeader 作为默认的 headerLeft
+  const defaultScreenOptions = {
+    headerLeft: () => <DefaultHeader />,
     headerTitle: "", 
     headerStyle: {
       backgroundColor: '#F7F4EE',
     },
-  });
+  };
 
   return (
     <Provider store={store}>
@@ -102,7 +99,19 @@ export default function App() {
             <Stack.Screen
               name="Meditation"
               component={MeditationScreen}
-              options={{ headerTitle: 'Meditation' }}
+              options={{
+                headerTitle: 'Meditation',
+                headerTransparent: true,  
+                headerStyle: {
+                  backgroundColor: 'transparent',  
+                  elevation: 0,  
+                  shadowOpacity: 0,  
+                },
+                headerTitleStyle: {
+                  color: '#fff',
+                },
+                headerLeft: () => <CustomHeader />,  // 使用自定义头部
+              }}
             />
             <Stack.Screen 
               name="AiChatReportScreen" 
@@ -112,7 +121,7 @@ export default function App() {
               }} 
             />
             <Stack.Screen
-              name="DeepBreathing"
+              name="DeepBreathingScreen"
               component={DeepBreathingScreen}
               options={{ headerTitle: '深呼吸练习' }}
             />
@@ -122,9 +131,9 @@ export default function App() {
               options={{ headerTitle: "情绪疗愈选择" }}
             />
             <Stack.Screen
-              name="TherapistSettingScreen" // 注册疗愈师风格选择页面
+              name="TherapistSettingScreen"
               component={TherapistSettingScreen}
-              options={{ headerTitle: "选择疗愈师风格" }} // 自定义标题
+              options={{ headerTitle: "选择疗愈师风格" }}
             />
           </Stack.Navigator>
         </View>
