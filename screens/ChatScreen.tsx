@@ -151,7 +151,7 @@ export default function ChatScreen() {
   };
 
   const endConversation = () => {
-    navigation.navigate('AiChatReportScreen');
+    navigation.navigate('AiChatReportScreen' as never);
   };
 
   return (
