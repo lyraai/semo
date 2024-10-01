@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "my-semo-app",
-    "slug": "my-semo-app",
-    "version": "1.0.0",
+    "name": "lyraai",
+    "slug": "semo",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -11,17 +11,34 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.semo.ai"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.semo.ai"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "0a4c30a2-6ec3-42c1-91a3-0764390cc92c"
+      }
+    },
+    "owner": "lyraai",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/0a4c30a2-6ec3-42c1-91a3-0764390cc92c"
     }
   }
 }
