@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { updateAnswer } from '../redux/slices/questionnaireSlice';
 import { sendQuestionnaireData } from '../service/api'; // 导入发送问卷数据的API
 import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootState } from '../redux/store';
 import { colors } from '../styles/color';
 
@@ -16,12 +17,14 @@ type RootStackParamList = {
   };
 };
 
+type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'ChatScreen'>;
+
 export default function TherapistSettingScreen() {
   const [selectedStyle, setSelectedStyle] = useState<string>('');
   const questionnaireData = useSelector((state: RootState) => state.questionnaire);
   const userId = useSelector((state: RootState) => state.user.userId);
   const dispatch = useDispatch();
-  const navigation = useNavigation(); // 使用 useNavigation 钩子
+  const navigation = useNavigation<NavigationProp>(); // 使用 useNavigation 钩子
 
   const handleStyleSelect = (style: string) => {
     setSelectedStyle(style);
