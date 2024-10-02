@@ -11,6 +11,9 @@ import {
   StyleSheet,
   ScrollView,
   ActivityIndicator,
+  Keyboard,
+  Animated,
+  Platform,
 } from 'react-native';
 import { getAIResponse, checkBackendConnection, useMock } from '../service/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -37,6 +40,10 @@ export default function ChatScreen() {
   const navigation = useNavigation();
   const route = useRoute<RouteProp<{ params: Params }, 'params'>>();
   const scrollViewRef = useRef<ScrollView | null>(null);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const animatedPadding = useRef(new Animated.Value(0)).current;
+  const [optionsHeight, setOptionsHeight] = useState(0);
+  const [bottomPadding, setBottomPadding] = useState(33); // 默认值设为 33
 
   // 从 Redux 获取 semoUserId
   const semoUserId = useSelector((state: RootState) => state.user.userId);
@@ -64,7 +71,7 @@ export default function ChatScreen() {
     }
   }, [semoUserId, dispatch]);
 
-  // 接收从 TherapistSettingScreen 传递过来的初始消息、选项和 topicId
+  // 接收从 TherapistSettingScreen 传递过的初始消息、选项和 topicId
   useEffect(() => {
     const { initialMessage, initialOptions, initialTopicId } = route.params || {};
 
@@ -88,6 +95,44 @@ export default function ChatScreen() {
   useEffect(() => {
     scrollViewRef.current?.scrollToEnd({ animated: true });
   }, [messages]);
+
+  useEffect(() => {
+    const keyboardWillShowListener = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+      (e) => {
+        const height = e.endCoordinates.height;
+        setKeyboardHeight(height);
+        Animated.timing(animatedPadding, {
+          toValue: height,
+          duration: 250,
+          useNativeDriver: false,
+        }).start();
+        // 添加延时以确保在键盘完全显示后滚动
+        setTimeout(() => scrollToBottom(), 300);
+      }
+    );
+    const keyboardWillHideListener = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+      () => {
+        setKeyboardHeight(0);
+        Animated.timing(animatedPadding, {
+          toValue: 0,
+          duration: 250,
+          useNativeDriver: false,
+        }).start();
+      }
+    );
+
+    return () => {
+      keyboardWillShowListener.remove();
+      keyboardWillHideListener.remove();
+    };
+  }, []);
+
+  // 添加一个新的函数来处理滚动到底部
+  const scrollToBottom = () => {
+    scrollViewRef.current?.scrollToEnd({ animated: true });
+  };
 
   const sendMessage = async () => {
     console.log('semoUserId in sendMessage:', semoUserId);
@@ -114,7 +159,7 @@ export default function ChatScreen() {
   
         const response = await getAIResponse(semoUserId, inputText, topicId);
   
-        // 打印从后端接收到的完整响应
+        // 打印从后端接收的完整响应
         console.log("AI Response from backend:", response);
   
         // 更新消息和其他状态
@@ -131,6 +176,8 @@ export default function ChatScreen() {
         console.error('Failed to get AI response:', error);
       } finally {
         setLoading(false);
+        // 添加延时以确保在新消息被添加到列表后滚动
+        setTimeout(() => scrollToBottom(), 100);
       }
     } else {
       console.error('Message not sent. Either input is empty or User ID is missing.');
@@ -154,11 +201,19 @@ export default function ChatScreen() {
     navigation.navigate('AiChatReportScreen' as never);
   };
 
+  const onOptionsLayout = (event) => {
+    const { height } = event.nativeEvent.layout;
+    setOptionsHeight(height);
+  };
+
   return (
-    <SafeAreaView style={styles.container}>
+    <Animated.View style={[styles.container, { paddingBottom: animatedPadding }]}>
       <ScrollView 
         style={styles.messagesContainer} 
-        contentContainerStyle={styles.messagesContentContainer}
+        contentContainerStyle={[
+          styles.messagesContentContainer,
+          { paddingBottom: bottomPadding }
+        ]}
         keyboardShouldPersistTaps="handled"
         ref={scrollViewRef}
       >
@@ -177,17 +232,24 @@ export default function ChatScreen() {
         {loading && <ActivityIndicator size="large" color="#f06262" style={styles.loadingIndicator} />}
       </ScrollView>
 
-      <View style={styles.footerContainer}>
-        <View style={styles.emotionIndicatorContainer}>
-          <View style={[styles.emotionIndicator, { backgroundColor: getEmotionColor(emotion) }]} />
-        </View>
+      <View style={styles.optionsAndEmotionContainer}>
         <View style={styles.optionsContainer}>
           {predictedOptions.map((option, index) => (
-            <TouchableOpacity key={index} style={styles.optionButton} onPress={() => handleOptionPress(option)}>
+            <TouchableOpacity 
+              key={index} 
+              style={styles.optionButton} 
+              onPress={() => handleOptionPress(option)}
+            >
               <Text style={styles.optionButtonText}>{option}</Text>
             </TouchableOpacity>
           ))}
         </View>
+        <View style={styles.emotionIndicatorContainer}>
+          <View style={[styles.emotionIndicator, { backgroundColor: getEmotionColor(emotion) }]} />
+        </View>
+      </View>
+
+      <View style={styles.footerContainer}>
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
@@ -205,7 +267,7 @@ export default function ChatScreen() {
           <Text style={styles.endButtonText}>结束对话</Text>
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </Animated.View>
   );
 }
 
@@ -220,7 +282,43 @@ const styles = StyleSheet.create({
   messagesContentContainer: {
     paddingHorizontal: 20,
     paddingVertical: 15,
+    // paddingBottom 已移除，现在通过 state 控制
+  },
+  optionsAndEmotionContainer: {
+    flexDirection: 'row',
     justifyContent: 'flex-end',
+    alignItems: 'flex-end',
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    backgroundColor: '#F7F4EE',
+  },
+  emotionIndicatorContainer: {
+    marginLeft: 8,
+  },
+  emotionIndicator: {
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+  },
+  optionsContainer: {
+    flexDirection: 'row-reverse',
+    flexWrap: 'wrap',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    flex: 1,
+  },
+  optionButton: {
+    backgroundColor: '#ffffff', // 白色背景
+    borderWidth: 1, // 添加边框
+    borderColor: colors.primary, // 使用主色（红色）作为边框颜色
+    borderRadius: 15,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    margin: 2,
+  },
+  optionButtonText: {
+    color: colors.primary, // 使用主色（红色）作为文字颜色
+    fontSize: 14,
   },
   userMessageBubble: {
     backgroundColor: colors.primary,
@@ -251,35 +349,11 @@ const styles = StyleSheet.create({
   },
   footerContainer: {
     paddingHorizontal: 20,
-    paddingVertical: 10,
+    paddingTop: 10,
+    paddingBottom: 5, // 减少底部padding
     borderTopWidth: 1,
     borderTopColor: '#ddd',
-  },
-  emotionIndicatorContainer: {
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  emotionIndicator: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-  },
-  optionsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    flexWrap: 'wrap',
-    marginBottom: 10,
-  },
-  optionButton: {
-    backgroundColor: colors.primary,
-    borderRadius: 20,
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    margin: 5,
-  },
-  optionButtonText: {
-    color: '#ffffff',
-    fontSize: 16,
+    backgroundColor: '#F7F4EE',
   },
   inputContainer: {
     flexDirection: 'row',
