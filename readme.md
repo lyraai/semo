@@ -1,6 +1,11 @@
 ## 简介
 这是一个基于 Expo 和 Next.js 构建的跨平台应用，支持移动端和 Web 端开发。该应用使用 Redux 来管理状态，Axios 处理 API 请求，React Navigation 处理页面路由。
 
+
+## 项目开发管理 (Permission required)
+https://github.com/users/lyraai/projects/1
+
+
 ## 安装指南
 
 ### 1. 环境要求
@@ -107,5 +112,25 @@ yarn install --force
 
 ```bash
 yarn install --force
+```
+
+###
+本地测试：
+第一次需要development build
+```bash
+npx expo run:ios
+```
+
+```bash
+npx expo run:android
+```
+
+Testfight 打包发布
+```bash
+eas login
+```
+
+```bash
+eas build --platform ios --profile testflight
 ```
 
