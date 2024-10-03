@@ -3,10 +3,11 @@ import { View, Text, Image, StyleSheet, Button, Alert, Platform, TouchableOpacit
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../App';
 import { checkBackendConnection, generateUserId } from '../service/api';
-import { useDispatch } from 'react-redux';
-import { updateUserId } from '../redux/slices/userSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { updateUserId, loadUserIdFromStorage } from '../redux/slices/userSlice';
 import { colors } from '../styles/color';
 import Constants from 'expo-constants';
+import { RootState } from '../redux/store'; // 确保您有这个导入
 
 type WelcomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Welcome'>;
 
@@ -18,8 +19,10 @@ export default function WelcomeScreen({ navigation }: Props) {
   const [connectionStatus, setConnectionStatus] = useState<string | null>(null);
   const [textOpacity] = useState(new Animated.Value(1));
   const dispatch = useDispatch();
+  const userId = useSelector((state: RootState) => state.user.userId);
 
   useEffect(() => {
+    dispatch(loadUserIdFromStorage());
     const checkConnection = async () => {
       try {
         const result = await checkBackendConnection();
@@ -29,7 +32,7 @@ export default function WelcomeScreen({ navigation }: Props) {
       }
     };
     checkConnection();
-  }, []);
+  }, [dispatch]);
 
   const handleGenerateUserId = async () => {
     try {
@@ -79,7 +82,11 @@ export default function WelcomeScreen({ navigation }: Props) {
         {connectionStatus && (
           <Text style={styles.connectionStatus}>{connectionStatus}</Text>
         )}
-        <Button title="测试生成用户ID" onPress={handleGenerateUserId} color="#4CAF50" />
+        {userId ? (
+          <Text style={styles.userIdText}>当前用户ID: {userId}</Text>
+        ) : (
+          <Button title="生成用户ID" onPress={handleGenerateUserId} color="#4CAF50" />
+        )}
       </View>
 
       {/* 底部固定按钮 */}
@@ -129,6 +136,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   connectionStatus: {
+    fontSize: 14,
+    color: colors.textGray500,
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  userIdText: {
     fontSize: 14,
     color: colors.textGray500,
     marginBottom: 20,
