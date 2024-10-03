@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet, Button, Alert, Platform } from 'react-native';
+import { View, Text, Image, StyleSheet, Button, Alert, Platform, TouchableOpacity, Animated, SafeAreaView } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../App';
 import { checkBackendConnection, generateUserId } from '../service/api';
@@ -16,30 +16,48 @@ type Props = {
 
 export default function WelcomeScreen({ navigation }: Props) {
   const [connectionStatus, setConnectionStatus] = useState<string | null>(null);
-  const dispatch = useDispatch();  // 使用 Redux dispatch
-  
+  const [textOpacity] = useState(new Animated.Value(1));
+  const dispatch = useDispatch();
+
   useEffect(() => {
     const checkConnection = async () => {
       try {
         const result = await checkBackendConnection();
-        setConnectionStatus(result.message || '连接成功'); // 假设返回的对象有 message 属性
+        setConnectionStatus(result.message || '连接成功');
       } catch (error) {
         setConnectionStatus('无法连接到服务器，已切换到模拟模式');
       }
     };
-
     checkConnection();
   }, []);
 
   const handleGenerateUserId = async () => {
     try {
       const id = await generateUserId();
-      dispatch(updateUserId(id));  // 将 userId 存储到 Redux
+      dispatch(updateUserId(id));
       Alert.alert('用户ID生成成功', `生成的用户ID: ${id}`);
     } catch (error) {
       Alert.alert('生成用户ID失败', '请检查网络连接或后端状态');
     }
   };
+
+  // 动态文字透明度变化效果
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(textOpacity, {
+          toValue: 0.5,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(textOpacity, {
+          toValue: 1,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+  }, [textOpacity]);
 
   const version = Constants.expoConfig?.version || '未知';
   const buildNumber = Platform.select({
@@ -47,44 +65,51 @@ export default function WelcomeScreen({ navigation }: Props) {
     android: Constants.expoConfig?.android?.versionCode?.toString(),
   }) || '未知';
 
-  console.log('Version:', version);
-  console.log('Build Number:', buildNumber);
-
   return (
-    <View style={styles.container}>
-      <Image source={require('../assets/logos/1x/logo.png')} style={styles.logo} />
-      <Text style={styles.title}>欢迎来到Semo心茉</Text>
-      <Text style={styles.subtitle}>你的情绪急救助手 version: {version} (build: {buildNumber})</Text>
-      {connectionStatus && (
-        <Text style={styles.connectionStatus}>{connectionStatus}</Text>
-      )}
+    <SafeAreaView style={styles.container}>
+      {/* 顶部Logo和欢迎信息 */}
+      <View style={styles.topSection}>
+        <Image source={require('../assets/logos/1x/logo.png')} style={styles.logo} />
+        <Text style={styles.title}>欢迎来到Semo心茉</Text>
+        <Text style={styles.subtitle}>你的情绪急救助手 version: {version} (build: {buildNumber})</Text>
+      </View>
 
-      <Button
-        title="开始"
-        onPress={() => navigation.navigate('Question0')}
-        color="#f06262"
-      />
-      
-      {/* 新增的生成用户ID的按钮 */}
-      <View style={styles.testButtonContainer}>
+      {/* 固定高度的测试信息 */}
+      <View style={styles.middleSection}>
+        {connectionStatus && (
+          <Text style={styles.connectionStatus}>{connectionStatus}</Text>
+        )}
         <Button title="测试生成用户ID" onPress={handleGenerateUserId} color="#4CAF50" />
       </View>
-    </View>
+
+      {/* 底部固定按钮 */}
+      <View style={styles.bottomSection}>
+        <TouchableOpacity onPress={() => navigation.navigate('Question0')}>
+          <Animated.Text style={[styles.startButtonText, { opacity: textOpacity }]}>
+            开始
+          </Animated.Text>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: colors.background,
+  },
+  topSection: {
+    flex: 9, // 顶部部分占据较大空间
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F7F4EE',
-    padding: 20,
+    paddingHorizontal: 20,
+    paddingTop: 20,
   },
   logo: {
-    width: 250,
-    height: 250,
-    marginBottom: 40,
+    width: 300,
+    height: 300,
+    marginBottom: 0,
   },
   title: {
     fontSize: 24,
@@ -93,21 +118,31 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   subtitle: {
-    fontSize: 18,
-    color: '#666', // 确保这个颜色与背景形成对比
-    marginBottom: 10,
+    fontSize: 14,
+    color: colors.textGray500,
+    textAlign: 'center',
+  },
+  middleSection: {
+    flex: 1, // 中间部分固定高度
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
   },
   connectionStatus: {
-    fontSize: 16,
-    color: colors.primary,
+    fontSize: 14,
+    color: colors.textGray500,
     marginBottom: 20,
+    textAlign: 'center',
   },
-  testButtonContainer: {
-    marginTop: 20,
+  bottomSection: {
+    flex: 1, // 底部部分固定空间
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    paddingBottom: 30, // 合理的底部内边距
   },
-  userIdText: {
-    marginTop: 10,
-    fontSize: 16,
-    color: '#4CAF50',
-  }
+  startButtonText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: colors.primary,
+  },
 });

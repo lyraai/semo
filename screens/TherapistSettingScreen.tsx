@@ -1,3 +1,4 @@
+// screens/TherapistSettingScreen.tsx
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
@@ -42,11 +43,11 @@ export default function TherapistSettingScreen() {
       const response = await sendQuestionnaireData(userId, questionnaireData);
 
       console.log('API Response:', response);
-      
+
       // 将 response 的内容传递到 ChatScreen
       navigation.navigate('ChatScreen', {
-        initialMessage: response.content, 
-        initialOptions: response.predicted_options, 
+        initialMessage: response.content,
+        initialOptions: response.predicted_options,
         initialTopicId: response.topic_id,
       });
     } catch (error) {
@@ -56,28 +57,57 @@ export default function TherapistSettingScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>选择您的疗愈师风格</Text>
-      <TouchableOpacity
-        style={[styles.styleButton, selectedStyle === '温暖' && styles.selectedButton]}
-        onPress={() => handleStyleSelect('温暖')}
-      >
-        <Text style={styles.buttonText}>温暖</Text>
-      </TouchableOpacity>
+      {/* 内容容器 */}
+      <View style={styles.contentContainer}>
+        <Text style={styles.header}>选择您的疗愈师风格</Text>
+        <TouchableOpacity
+          style={[
+            styles.styleButton,
+            selectedStyle === '温暖' && styles.selectedButton,
+          ]}
+          onPress={() => handleStyleSelect('温暖')}
+        >
+          <Text
+            style={[
+              styles.buttonText,
+              selectedStyle === '温暖' && styles.selectedButtonText,
+            ]}
+          >
+            温暖
+          </Text>
+        </TouchableOpacity>
 
-      <TouchableOpacity
-        style={[styles.styleButton, selectedStyle === '理性' && styles.selectedButton]}
-        onPress={() => handleStyleSelect('理性')}
-      >
-        <Text style={styles.buttonText}>理性</Text>
-      </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.styleButton,
+            selectedStyle === '理性' && styles.selectedButton,
+          ]}
+          onPress={() => handleStyleSelect('理性')}
+        >
+          <Text
+            style={[
+              styles.buttonText,
+              selectedStyle === '理性' && styles.selectedButtonText,
+            ]}
+          >
+            理性
+          </Text>
+        </TouchableOpacity>
+      </View>
 
-      <TouchableOpacity
-        style={styles.confirmButton}
-        onPress={handleConfirm}
-        disabled={!selectedStyle} // 未选择风格时禁用按钮
-      >
-        <Text style={styles.confirmButtonText}>确认并开始对话</Text>
-      </TouchableOpacity>
+      {/* 底部容器 */}
+      <View style={styles.footer}>
+        <TouchableOpacity
+          style={[
+            styles.confirmButton,
+            !selectedStyle && styles.disabledButton,
+          ]}
+          onPress={handleConfirm}
+          disabled={!selectedStyle} // 未选择风格时禁用按钮
+        >
+          <Text style={styles.confirmButtonText}>开始对话</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -85,17 +115,27 @@ export default function TherapistSettingScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: colors.background01,
+  },
+  contentContainer: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F7F4EE',
+    paddingHorizontal: 20,
+  },
+  footer: {
+    height: 120,
+    paddingVertical: 20,
+    alignItems: 'center',
   },
   header: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 20,
+    color: colors.primary,
+    marginBottom: 40,
   },
   styleButton: {
-    backgroundColor: '#ccc',
+    backgroundColor: colors.white,
     padding: 15,
     borderRadius: 30,
     width: '80%',
@@ -106,8 +146,12 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
   },
   buttonText: {
-    color: '#fff',
+    color: colors.textGray700,
     fontSize: 18,
+    fontWeight: 'bold',
+  },
+  selectedButtonText: {
+    color: colors.textPrimary,
   },
   confirmButton: {
     backgroundColor: colors.primary,
@@ -115,11 +159,13 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     width: '80%',
     alignItems: 'center',
-    marginTop: 30,
   },
   confirmButtonText: {
-    color: '#fff',
+    color: colors.textPrimary,
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  disabledButton: {
+    backgroundColor: colors.disabled,
   },
 });

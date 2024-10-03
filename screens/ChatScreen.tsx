@@ -190,11 +190,11 @@ export default function ChatScreen() {
 
   // 根据情绪值设置颜色
   const getEmotionColor = (emotionValue: number | null) => {
-    if (emotionValue === null) return '#ddd';
-    if (emotionValue > 0.75) return '#FF6347';
-    if (emotionValue > 0.5) return '#FFA500';
-    if (emotionValue > 0.25) return '#FFFF00';
-    return '#32CD32';
+    if (emotionValue === null) return colors.white;
+    if (emotionValue > 0.75) return colors.sub;
+    if (emotionValue > 0.5) return colors.primary;
+    if (emotionValue > 0.25) return colors.sub;
+    return colors.primary;
   };
 
   const endConversation = () => {
@@ -293,7 +293,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#F7F4EE',
   },
   emotionIndicatorContainer: {
-    marginLeft: 8,
+    marginLeft: 5,
+    marginVertical:3,
   },
   emotionIndicator: {
     width: 16,
@@ -308,13 +309,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   optionButton: {
-    backgroundColor: '#ffffff', // 白色背景
+    backgroundColor: colors.white, // 白色背景
     borderWidth: 1, // 添加边框
-    borderColor: colors.primary, // 使用主色（红色）作为边框颜色
-    borderRadius: 15,
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-    margin: 2,
+    borderColor: colors.sub, // 使用主色（红色）作为边框颜色
+    borderRadius: 20,
+    paddingVertical: 7,
+    paddingHorizontal: 15,
+    margin: 3,
   },
   optionButtonText: {
     color: colors.primary, // 使用主色（红色）作为文字颜色
@@ -323,29 +324,31 @@ const styles = StyleSheet.create({
   userMessageBubble: {
     backgroundColor: colors.primary,
     alignSelf: 'flex-end',
-    maxWidth: '70%',
-    padding: 10,
+    maxWidth: '80%',
+    paddingVertical: 10,
+    paddingHorizontal:15,
     borderRadius: 20,
     marginVertical: 5,
   },
   aiMessageBubble: {
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.white,
     alignSelf: 'flex-start',
-    maxWidth: '70%',
-    padding: 10,
+    maxWidth: '80%',
+    paddingVertical: 10,
+    paddingHorizontal:15,
     borderRadius: 20,
     marginVertical: 5,
   },
   userMessageText: {
-    fontSize: 16,
-    color: '#ffffff',
+    fontSize: 15,
+    color: colors.white,
   },
   aiMessageText: {
-    fontSize: 16,
-    color: '#333',
+    fontSize: 15,
+    color: colors.gray600,
   },
   loadingIndicator: {
-    marginVertical: 10,
+    marginVertical: 20,
   },
   footerContainer: {
     paddingHorizontal: 20,
@@ -361,7 +364,7 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    borderWidth: 1.5,
+    borderWidth: 0,
     borderColor: colors.primary,
     borderRadius: 20,
     paddingHorizontal: 15,
@@ -383,9 +386,10 @@ const styles = StyleSheet.create({
   endButton: {
     backgroundColor: colors.primary,
     borderRadius: 30,
-    paddingVertical: 15,
+    paddingVertical: 10,
     paddingHorizontal: 20,
     marginTop: 10,
+    marginBottom:20,
     alignItems: 'center',
   },
   endButtonText: {

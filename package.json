@@ -26,6 +26,7 @@
     "expo": "~51.0.28",
     "expo-av": "~14.0.7",
     "expo-dev-client": "~4.0.27",
+    "expo-linear-gradient": "~13.0.2",
     "expo-status-bar": "~1.12.1",
     "expo-updates": "~0.25.25",
     "metro": "^0.80.11",

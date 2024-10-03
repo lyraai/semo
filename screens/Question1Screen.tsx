@@ -1,11 +1,12 @@
-// my-semo-app/screens/Question1Screen.tsx
+// screens/Question1Screen.tsx
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { updateAnswer } from '../redux/slices/questionnaireSlice';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../App';
 import { colors } from '../styles/color';
+import ProgressBar from '../components/ProgressBar';
 
 type Question1ScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Question1'>;
 
@@ -37,7 +38,7 @@ export default function Question1Screen({ navigation }: Props) {
       onPress={() => handleAnswer(answer)}
     >
       <Text style={[
-        styles.buttonText, 
+        styles.buttonText,
         selectedAnswer === answer && styles.selectedButtonText // 修改文字样式
       ]}>
         {title}
@@ -47,29 +48,40 @@ export default function Question1Screen({ navigation }: Props) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.question}>现在的关系状态是...</Text>
-      <View style={styles.optionsContainer}>
-        {renderButton('完全断联', '完全断联')}
-        {renderButton('偶尔联系', '偶尔联系')}
-        {renderButton('复复分合', '复复分合')}
-        {renderButton('对方已有新恋情', '对方已有新恋情')}
-        {renderButton('我已有新恋情', '我已有新恋情')}
+      {/* Progress Bar */}
+      <View style={styles.progressBarContainer}>
+        <ProgressBar currentStep={1} totalSteps={5} />
       </View>
-      <TouchableOpacity
-        style={[
-          styles.nextButton,
-          !selectedAnswer && styles.disabledNextButton, // 未选中时的样式
-        ]}
-        onPress={handleNext}
-        disabled={!selectedAnswer} // 选项未选择时禁用“下一步”按钮
-      >
-        <Text style={[
-          styles.nextButtonText,
-          !selectedAnswer && styles.disabledNextButtonText, // 未激活时的文字样式
-        ]}>
-          下一步
-        </Text>
-      </TouchableOpacity>
+      {/* Content */}
+      <View style={styles.contentContainer}>
+        <Text style={styles.label}>现在的关系状态是...</Text>
+        <View style={styles.optionsContainer}>
+          {renderButton('完全断联', '完全断联')}
+          {renderButton('偶尔联系', '偶尔联系')}
+          {renderButton('复复分合', '复复分合')}
+          {renderButton('对方已有新恋情', '对方已有新恋情')}
+          {renderButton('我已有新恋情', '我已有新恋情')}
+        </View>
+      </View>
+
+      {/* Bottom Button */}
+      <View style={styles.bottomButtonContainer}>
+        <TouchableOpacity
+          style={[
+            styles.nextButton,
+            !selectedAnswer && styles.disabledNextButton // 未选中时的样式
+          ]}
+          onPress={handleNext}
+          disabled={!selectedAnswer}
+        >
+          <Text style={[
+            styles.nextButtonText,
+            !selectedAnswer && styles.disabledNextButtonText // 未激活时的文字样式
+          ]}>
+            继续回答
+          </Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -77,24 +89,34 @@ export default function Question1Screen({ navigation }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f7f4EE',
-    padding: 20,
+    backgroundColor: colors.background01,
   },
-  question: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 20,
+  progressBarContainer: {
+    height: 150,
+    paddingHorizontal: 10,
+  },
+  contentContainer: {
+    flexGrow: 1,
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    marginVertical: 20,
+  },
+  label: {
+    fontSize: 18,
+    fontWeight: '500',
+    lineHeight: 24,
+    letterSpacing: 0.5,
+    color: colors.textGray600,
+    textAlign: 'center',
+    marginVertical: 0,
   },
   optionsContainer: {
     width: '100%',
-    justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 30, // 增加按钮与"下一步"按钮的间距
+    marginVertical: 20,
   },
   button: {
-    backgroundColor: '#fff', // 默认未选中的按钮背景颜色
+    backgroundColor: '#fff',
     padding: 15,
     borderRadius: 30,
     marginBottom: 15,
@@ -104,7 +126,7 @@ const styles = StyleSheet.create({
     borderWidth: 0,
   },
   selectedButton: {
-    backgroundColor: colors.primary, // 选中时的按钮背景颜色
+    backgroundColor: colors.primary,
   },
   buttonText: {
     color: '#333231',
@@ -112,24 +134,35 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   selectedButtonText: {
-    color: '#fff', // 选中时的文字颜色
+    color: '#fff',
+  },
+  bottomButtonContainer: {
+    height: 150,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   nextButton: {
-    backgroundColor: colors.primary, // 激活时的背景颜色
-    padding: 15,
+    backgroundColor: colors.primary,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
     borderRadius: 30,
     width: '80%',
     alignItems: 'center',
   },
   disabledNextButton: {
-    backgroundColor: '#ccc', // 未激活时的背景颜色
+    backgroundColor: colors.disabled,
   },
   nextButtonText: {
-    color: '#fff',
+    color: colors.textPrimary,
     fontSize: 18,
     fontWeight: 'bold',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
   },
   disabledNextButtonText: {
-    color: '#666', // 未激活时的文字颜色
+    color: colors.textDisabled,
+    fontSize: 18,
+    fontWeight: 'bold',
+    letterSpacing: 1,
   },
 });

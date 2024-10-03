@@ -1,10 +1,21 @@
-// /Users/bailangcheng/Desktop/semo/screens/ToolSelectionScreen.tsx
+// screens/ToolSelectionScreen.tsx
 import React, { useRef, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Dimensions, Alert, Animated } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context'; 
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Image,
+  TouchableOpacity,
+  Dimensions,
+  Alert,
+  Animated,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../styles/color';
 
 const { width } = Dimensions.get('window');
+const cardWidth = width * 0.8 + 30; // 卡片宽度 + 左右边距
 
 export default function ToolSelectionScreen({ navigation }) {
   const scrollX = useRef(new Animated.Value(0)).current;
@@ -21,73 +32,94 @@ export default function ToolSelectionScreen({ navigation }) {
 
   const handleScroll = (event) => {
     const contentOffsetX = event.nativeEvent.contentOffset.x;
-    const index = Math.round(contentOffsetX / width);
+    const index = Math.round(contentOffsetX / cardWidth);
     setActiveIndex(index);
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <Text style={styles.title}>选择一种方式</Text>
-        <Text style={styles.subtitle}>情绪急救选项</Text>
+        {/* 内容容器 */}
+        <View style={styles.contentContainer}>
+          <Text style={styles.title}>选择疗愈方式</Text>
+          <Text style={styles.subtitle}>在主界面可以选择疗愈方式</Text>
 
-        <ScrollView
-          horizontal
-          pagingEnabled
-          showsHorizontalScrollIndicator={false}
-          snapToInterval={width} // 确保卡片居中对齐
-          decelerationRate="fast"
-          contentContainerStyle={styles.cardContainer}
-          onScroll={Animated.event(
-            [{ nativeEvent: { contentOffset: { x: scrollX } } }],
-            { listener: handleScroll, useNativeDriver: false }
-          )}
-          scrollEventThrottle={16}
-        >
-          <TouchableOpacity onPress={() => handleCardPress('ChatScreen')}>
-            <View style={styles.card}>
-              <Image source={require('../assets/icons/1x/Telegram App.png')} style={styles.icon} />
-              <Text style={styles.cardTitle}>疗愈对话</Text>
-              <Text style={styles.cardSubtitle}>与疗愈师进行温暖的对话，倾诉您的感受</Text>
-            </View>
-          </TouchableOpacity>
+          <ScrollView
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            snapToInterval={cardWidth}
+            decelerationRate="fast"
+            contentContainerStyle={styles.cardContainer}
+            onScroll={Animated.event(
+              [{ nativeEvent: { contentOffset: { x: scrollX } } }],
+              { listener: handleScroll, useNativeDriver: false }
+            )}
+            scrollEventThrottle={16}
+          >
+            <TouchableOpacity onPress={() => handleCardPress('ChatScreen')}>
+              <View style={styles.card}>
+                <Image
+                  source={require('../assets/icons/2x/Telegram App.png')}
+                  style={styles.icon}
+                />
+                <Text style={styles.cardTitle}>疗愈对话</Text>
+                <Text style={styles.cardSubtitle}>
+                  与疗愈师进行温暖的对话，{"\n"}倾诉您的感受
+                </Text>
+              </View>
+            </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => handleCardPress('Meditation')}>
-            <View style={styles.card}>
-              <Image source={require('../assets/icons/1x/Thinking Bubble-1.png')} style={styles.icon} />
-              <Text style={styles.cardTitle}>引导冥想</Text>
-              <Text style={styles.cardSubtitle}>通过冥想练习平静心灵，缓解情绪</Text>
-            </View>
-          </TouchableOpacity>
+            <TouchableOpacity onPress={() => handleCardPress('Meditation')}>
+              <View style={styles.card}>
+                <Image
+                  source={require('../assets/icons/2x/Thinking Bubble-1.png')}
+                  style={styles.icon}
+                />
+                <Text style={styles.cardTitle}>引导冥想</Text>
+                <Text style={styles.cardSubtitle}>
+                  通过冥想练习{"\n"}平静心灵，缓解情绪
+                </Text>
+              </View>
+            </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => handleCardPress('DeepBreathing')}>
-            <View style={styles.card}>
-              <Image source={require('../assets/icons/1x/Lotus.png')} style={styles.icon} />
-              <Text style={styles.cardTitle}>深呼吸练习</Text>
-              <Text style={styles.cardSubtitle}>学习深呼吸技巧，快速舒缓情绪</Text>
-            </View>
-          </TouchableOpacity>
-        </ScrollView>
+            <TouchableOpacity onPress={() => handleCardPress('DeepBreathing')}>
+              <View style={styles.card}>
+                <Image
+                  source={require('../assets/icons/2x/Lotus.png')}
+                  style={styles.icon}
+                />
+                <Text style={styles.cardTitle}>深呼吸练习</Text>
+                <Text style={styles.cardSubtitle}>
+                  学习深呼吸技巧，{"\n"}快速舒缓情绪
+                </Text>
+              </View>
+            </TouchableOpacity>
+          </ScrollView>
 
-        {/* 指示器 */}
-        <View style={styles.indicatorContainer}>
-          {[...Array(3).keys()].map((_, i) => (
-            <View
-              key={i}
-              style={[
-                styles.indicator,
-                { backgroundColor: activeIndex === i ? colors.primary : colors.disabled }
-              ]}
-            />
-          ))}
+          {/* 指示器 */}
+          <View style={styles.indicatorContainer}>
+            {[...Array(3).keys()].map((_, i) => (
+              <View
+                key={i}
+                style={[
+                  styles.indicator,
+                  {
+                    backgroundColor:
+                      activeIndex === i ? colors.primary : colors.disabled,
+                  },
+                ]}
+              />
+            ))}
+          </View>
         </View>
 
-        <Text style={styles.footerText}>亲爱的，您很勇敢。{"\n"}记住，每一步都是向着光明前进。</Text>
-    
-
-        <TouchableOpacity style={styles.confirmButton} onPress={() => Alert.alert('确认选择')}>
-          <Text style={styles.confirmButtonText}>我选择好了</Text>
-        </TouchableOpacity>
+        {/* 底部容器 */}
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>
+            亲爱的，您很勇敢。{'\n'}记住，每一步都是向着光明前进。
+          </Text>
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -96,29 +128,37 @@ export default function ToolSelectionScreen({ navigation }) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: colors.background, // 确保背景颜色一致
+    backgroundColor: colors.background01, // 确保背景颜色一致
   },
   container: {
     flex: 1,
+    backgroundColor: colors.background01,
+  },
+  contentContainer: {
+    flex: 1, // 占据剩余空间
     alignItems: 'center',
-    flexDirection: 'column', // 确保从上到下排列
-    backgroundColor: colors.background,
-    paddingTop: 0, // 可以根据需要调整
+    justifyContent: 'center',
+    paddingHorizontal: 0,
+  },
+  footer: {
+    paddingVertical: 20,
+    alignItems: 'center',
+    backgroundColor: colors.background01,
   },
   title: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: 'bold',
     color: colors.primary,
-    marginBottom: 5,
+    marginBottom: 10,
   },
   subtitle: {
-    fontSize: 18,
-    color: colors.primary,
+    fontSize: 14,
+    color: colors.textGray600,
     marginBottom: 10,
   },
   cardContainer: {
     alignItems: 'center',
-    paddingHorizontal: 10,
+    paddingHorizontal: (width - cardWidth) / 2, // 调整左右内边距，使第一个和最后一个卡片居中
   },
   card: {
     backgroundColor: colors.primary,
@@ -128,43 +168,36 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginHorizontal: 15,
-    padding: 20,
+    padding: 40,
   },
   icon: {
-    width: 100,
-    height: 100,
-    marginBottom: 20,
+    width: 150,
+    height: 150,
+    marginTop:20,
+    marginBottom: 50,
   },
   cardTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 24,
+    fontWeight: '800',
+    lineHeight: 0,    // 行高
+    letterSpacing: 0, // 字母间距
     color: colors.textPrimary,
-    marginBottom: 10,
+    marginBottom: 20,
   },
   cardSubtitle: {
-    fontSize: 16,
+    fontSize: 14,
     textAlign: 'center',
+    lineHeight: 20,    // 行高
+    letterSpacing: 0.5, // 字母间距
     color: colors.textPrimary,
   },
   footerText: {
-    fontSize: 16,
-    color: colors.textDisabled,
-    marginTop: 20,
+    fontSize: 14,
+    color: colors.textGray600,
+    lineHeight: 24,    // 行高
+    letterSpacing: 0.5, // 字母间距
     textAlign: 'center',
-  },
-  confirmButton: {
-    backgroundColor: colors.primary,
-    padding: 15,
-    borderRadius: 30,
-    marginTop: 20,
-    width: width * 0.8,
-    alignItems: 'center',
-    marginBottom: 20, // 避免与底部重叠
-  },
-  confirmButtonText: {
-    color: colors.textPrimary,
-    fontSize: 18,
-    fontWeight: 'bold',
+    marginBottom: 20,
   },
   indicatorContainer: {
     flexDirection: 'row',

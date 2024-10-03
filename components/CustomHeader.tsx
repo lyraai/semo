@@ -24,12 +24,14 @@ const CustomHeader = () => {
 
 const styles = StyleSheet.create({
   container: {
+    height: 60, // 自定义 Header 高度
     flexDirection: 'row',
     alignItems: 'center',
-    // 添加更多样式以适应您的设计需求
+    paddingLeft: 15,
+    // 根据需要调整背景色或其他样式
   },
   iconContainer: {
-    marginLeft: 15,
+    // 这里可以添加额外的图标样式
   },
 });
 

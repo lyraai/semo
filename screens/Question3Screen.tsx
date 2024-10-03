@@ -1,12 +1,17 @@
-import React, { useState } from 'react';
+// screens/Question3Screen.tsx
+import React, { useState, useRef } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { updateAnswer } from '../redux/slices/questionnaireSlice';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../App';
 import { colors } from '../styles/color';
+import ProgressBar from '../components/ProgressBar';
 
-type Question3ScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Question3'>;
+type Question3ScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'Question3'
+>;
 
 type Props = {
   navigation: Question3ScreenNavigationProp;
@@ -14,64 +19,127 @@ type Props = {
 
 export default function Question3Screen({ navigation }: Props) {
   const dispatch = useDispatch();
-  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
+  const [selectedAnswers, setSelectedAnswers] = useState<Record<string, number>>({});
 
-  const handleAnswer = (answer: string) => {
-    setSelectedAnswer(answer);
+  const pressStartTimes = useRef<Record<string, number>>({});
+
+  const handlePressIn = (emotion: string) => {
+    pressStartTimes.current[emotion] = Date.now();
+    // 更新边框颜色
+    setSelectedAnswers((prev) => ({ ...prev, [emotion]: prev[emotion] || 0 }));
+  };
+
+  const handlePressOut = (emotion: string) => {
+    const startTime = pressStartTimes.current[emotion];
+    const duration = Date.now() - startTime;
+    delete pressStartTimes.current[emotion];
+
+    // 将按压时间映射到 1-4 的等级
+    const maxPressDuration = 200; // 最大按压时间，2秒
+    let level = Math.ceil((duration / maxPressDuration) * 4);
+    if (level > 4) level = 4;
+    if (level < 1) level = 1;
+
+    setSelectedAnswers((prev) => ({ ...prev, [emotion]: level }));
+
+    // 更新答案
+    dispatch(
+      updateAnswer({
+        question: 'current_feeling',
+        answer: `${emotion} (等级${level})`,
+      })
+    );
+  };
+
+  const handleReset = (emotion: string) => {
+    setSelectedAnswers((prev) => ({ ...prev, [emotion]: 0 }));
+    dispatch(
+      updateAnswer({ question: 'current_feeling', answer: `${emotion} (等级0)` })
+    );
+  };
+
+  const getButtonAlpha = (level: number) => {
+    return level * 0.25; // 透明度与等级对应
+  };
+
+  const renderButton = (title: string, positionStyle: any) => {
+    const level = selectedAnswers[title] || 0;
+    const isSelected = level > 0;
+    const isPressing = !!pressStartTimes.current[title];
+
+    const borderColor = isPressing ? colors.primary : colors.gray400;
+
+    return (
+      <TouchableOpacity
+        key={title}
+        style={[
+          styles.button,
+          positionStyle,
+          {
+            borderColor: borderColor,
+            borderWidth: 1.5,
+            backgroundColor: isSelected
+              ? `rgba(225,77,90,${getButtonAlpha(level)})`
+              : 'transparent',
+          },
+        ]}
+        onPress={() => handleReset(title)}
+        onPressIn={() => handlePressIn(title)}
+        onPressOut={() => handlePressOut(title)}
+      >
+        <Text
+          style={[
+            styles.buttonText,
+            {
+              color: isSelected ? colors.textPrimary : colors.textGray400,
+            },
+          ]}
+        >
+          {title}
+        </Text>
+      </TouchableOpacity>
+    );
   };
 
   const handleNext = () => {
-    if (selectedAnswer) {
-      dispatch(updateAnswer({ question: 'current_feeling', answer: selectedAnswer }));
-      navigation.navigate('Question4');
-    }
+    navigation.navigate('Question4');
   };
 
-  const renderButton = (title: string, answer: string) => (
-    <TouchableOpacity
-      style={[
-        styles.button,
-        selectedAnswer === answer && styles.selectedButton,
-      ]}
-      onPress={() => handleAnswer(answer)}
-    >
-      <Text style={[
-        styles.buttonText,
-        selectedAnswer === answer && styles.selectedButtonText,
-      ]}>
-        {title}
-      </Text>
-    </TouchableOpacity>
-  );
+  // 定义按钮的位置
+  const buttonPositions = [
+    { title: '思念', top: 0, left: 50 },
+    { title: '孤独', top: 0, left: 180 },
+    { title: '迷茫', top: 100, left: 100 },
+    { title: '内疚', top: 100, left: 230 },
+    { title: '心痛', top: 200, left: 50 },
+    { title: '愤怒', top: 200, left: 180 },
+    { title: '希望', top: 300, left: 100 },
+    { title: '解脱', top: 300, left: 230 },
+  ];
 
   return (
     <View style={styles.container}>
-      <Text style={styles.question}>您现在的感受是...</Text>
-      <View style={styles.optionsContainer}>
-        {renderButton('思念', '思念')}
-        {renderButton('孤独', '孤独')}
-        {renderButton('迷茫', '迷茫')}
-        {renderButton('内疚', '内疚')}
-        {renderButton('心痛', '心痛')}
-        {renderButton('愤怒', '愤怒')}
-        {renderButton('希望', '希望')}
-        {renderButton('解脱', '解脱')}
+      {/* Progress Bar */}
+      <View style={styles.progressBarContainer}>
+        <ProgressBar currentStep={3} totalSteps={5} />
       </View>
-      <TouchableOpacity
-        style={[
-          styles.nextButton,
-          !selectedAnswer && styles.disabledNextButton,
-        ]}
-        onPress={handleNext}
-        disabled={!selectedAnswer}
-      >
-        <Text style={[
-          styles.nextButtonText,
-          !selectedAnswer && styles.disabledNextButtonText,
-        ]}>
-          下一步
-        </Text>
-      </TouchableOpacity>
+
+      {/* Content */}
+      <View style={styles.contentContainer}>
+        <Text style={styles.label}>您现在的感受是...</Text>
+        <View style={styles.optionsContainer}>
+          {buttonPositions.map((item) =>
+            renderButton(item.title, { top: item.top, left: item.left })
+          )}
+        </View>
+      </View>
+
+      {/* Bottom Button */}
+      <View style={styles.bottomButtonContainer}>
+        <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
+          <Text style={styles.nextButtonText}>继续回答</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -79,59 +147,64 @@ export default function Question3Screen({ navigation }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f7f4EE',
-    padding: 20,
+    backgroundColor: colors.background01,
   },
-  question: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 20,
+  progressBarContainer: {
+    height: 80,
+    paddingHorizontal: 10,
+  },
+  contentContainer: {
+    flexGrow: 1,
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+  },
+  label: {
+    fontSize: 18,
+    fontWeight: '500',
+    lineHeight: 24,
+    letterSpacing: 0.5,
+    color: colors.textGray600,
+    textAlign: 'center',
+    marginVertical: 30,
   },
   optionsContainer: {
     width: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 30,
+    height: 400, // 调整高度以适应按钮
+    position: 'relative',
   },
   button: {
-    backgroundColor: '#fff',
-    padding: 15,
-    borderRadius: 30,
-    marginBottom: 15,
-    width: '80%',
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    position: 'absolute',
+    justifyContent: 'center',
     alignItems: 'center',
-    borderColor: '#ddd',
-    borderWidth: 0,
-  },
-  selectedButton: {
-    backgroundColor: colors.primary,
+    // 背景颜色在 renderButton 中动态设置
   },
   buttonText: {
-    color: '#333231',
     fontSize: 16,
     fontWeight: 'bold',
+    textAlign: 'center',
   },
-  selectedButtonText: {
-    color: '#fff',
+  bottomButtonContainer: {
+    height: 150,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   nextButton: {
     backgroundColor: colors.primary,
-    padding: 15,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
     borderRadius: 30,
     width: '80%',
     alignItems: 'center',
   },
-  disabledNextButton: {
-    backgroundColor: '#ccc',
-  },
   nextButtonText: {
-    color: '#fff',
+    color: colors.textPrimary,
     fontSize: 18,
     fontWeight: 'bold',
-  },
-  disabledNextButtonText: {
-    color: '#666',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
   },
 });

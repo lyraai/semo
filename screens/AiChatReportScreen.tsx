@@ -177,13 +177,13 @@ export default function AiChatReportScreen({ route }) {
 }const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.background01,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: colors.background,
+    backgroundColor: colors.background01,
   },
   errorContainer: {
     flex: 1,
@@ -217,7 +217,7 @@ export default function AiChatReportScreen({ route }) {
   infoValue: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',  
+    color: colors.textGray600,  
   },
 
   // 第二部分样式
@@ -258,12 +258,12 @@ export default function AiChatReportScreen({ route }) {
   sectionTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333', 
+    color: colors.textGray600, 
     marginBottom: 10,
   },
   summaryText: {
     fontSize: 14,
-    color: '#333',
+    color: colors.textGray600,
     lineHeight: 22,
   },
   recommendationsContainer: {
@@ -271,7 +271,7 @@ export default function AiChatReportScreen({ route }) {
   },
   recommendationText: {
     fontSize: 14,
-    color: '#333',
+    color: colors.textGray600,
     marginBottom: 5,
   },
 

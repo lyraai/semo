@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator, StackNavigationProp } from '@react-navigation/stack';
-import { View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { Provider } from 'react-redux';
 import { store } from './redux/store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -70,74 +70,89 @@ export default function App() {
     headerTitle: "", 
     headerStyle: {
       backgroundColor: '#F7F4EE',
+      height: 110,
+     // 自定义 Header 的高度
+      // 其他样式如 padding, border, etc.
     },
+    headerTitleStyle: {
+      // 根据需要设置标题样式
+      fontSize: 18,
+      fontWeight: 'bold',
+    },
+    headerTintColor: '#E14D5A', // 统一设置 tintColor
   };
 
   return (
     <Provider store={store}>
       <NavigationContainer>
-        <View style={{ flex: 1, backgroundColor: '#F7F4EE' }}>
-          <Stack.Navigator initialRouteName="Welcome" screenOptions={defaultScreenOptions}>
-            <Stack.Screen
-              name="Welcome"
-              component={WelcomeScreen}
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen name="Question0" component={Question0Screen} />
-            <Stack.Screen name="Question1" component={Question1Screen} />
-            <Stack.Screen name="Question2" component={Question2Screen} />
-            <Stack.Screen name="Question3" component={Question3Screen} />
-            <Stack.Screen name="Question4" component={Question4Screen} />
-            <Stack.Screen name="FinalScreen" component={QuestionFinalScreen} />
-            <Stack.Screen 
-              name="ChatScreen" 
-              component={ChatScreen} 
-              options={{
-                headerTitle: "与semo聊天",
-              }} 
-            />
-            <Stack.Screen
-              name="Meditation"
-              component={MeditationScreen}
-              options={{
-                headerTitle: 'Meditation',
-                headerTransparent: true,  
-                headerStyle: {
-                  backgroundColor: 'transparent',  
-                  elevation: 0,  
-                  shadowOpacity: 0,  
-                },
-                headerTitleStyle: {
-                  color: '#fff',
-                },
-                headerLeft: () => <CustomHeader />,  // 使用自定义头部
-              }}
-            />
-            <Stack.Screen 
-              name="AiChatReportScreen" 
-              component={AiChatReportScreen} 
-              options={{
-                headerTitle: "semo总结",
-              }} 
-            />
-            <Stack.Screen
-              name="DeepBreathingScreen"
-              component={DeepBreathingScreen}
-              options={{ headerTitle: '深呼吸练习' }}
-            />
-            <Stack.Screen
-              name="ToolSelectionScreen"
-              component={ToolSelectionScreen}
-              options={{ headerTitle: "情绪疗愈选择" }}
-            />
-            <Stack.Screen
-              name="TherapistSettingScreen"
-              component={TherapistSettingScreen}
-              options={{ headerTitle: "选择疗愈师风格" }}
-            />
-          </Stack.Navigator>
-        </View>
+        <Stack.Navigator initialRouteName="Welcome" screenOptions={defaultScreenOptions}>
+          <Stack.Screen
+            name="Welcome"
+            component={WelcomeScreen}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen name="Question0" component={Question0Screen} />
+          <Stack.Screen name="Question1" component={Question1Screen} />
+          <Stack.Screen name="Question2" component={Question2Screen} />
+          <Stack.Screen name="Question3" component={Question3Screen} />
+          <Stack.Screen name="Question4" component={Question4Screen} />
+          <Stack.Screen name="FinalScreen" component={QuestionFinalScreen} />
+          <Stack.Screen 
+            name="ChatScreen" 
+            component={ChatScreen} 
+            options={{
+              headerTitle: "与semo聊天",
+            }} 
+          />
+          <Stack.Screen
+            name="Meditation"
+            component={MeditationScreen}
+            options={{
+              headerTitle: 'Meditation',
+              headerTransparent: true,  
+              headerStyle: {
+                backgroundColor: 'transparent',  
+                elevation: 0,  
+                shadowOpacity: 0,  
+                height: 60, // 确保高度一致
+              },
+              headerTitleStyle: {
+                color: '#fff',
+              },
+              headerLeft: () => <CustomHeader />,  // 使用自定义头部
+            }}
+          />
+          <Stack.Screen 
+            name="AiChatReportScreen" 
+            component={AiChatReportScreen} 
+            options={{
+              headerTitle: "semo总结",
+            }} 
+          />
+          <Stack.Screen
+            name="DeepBreathingScreen"
+            component={DeepBreathingScreen}
+            options={{ headerTitle: '' }}
+          />
+          <Stack.Screen
+            name="ToolSelectionScreen"
+            component={ToolSelectionScreen}
+            options={{ headerTitle: "" }}
+          />
+          <Stack.Screen
+            name="TherapistSettingScreen"
+            component={TherapistSettingScreen}
+            options={{ headerTitle: "" }}
+          />
+        </Stack.Navigator>
       </NavigationContainer>
     </Provider>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#F7F4EE',
+  },
+});
