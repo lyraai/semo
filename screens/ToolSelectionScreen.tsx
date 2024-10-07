@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../styles/color';
+import HomeHeader from '../components/HomeHeader';
 
 const { width } = Dimensions.get('window');
 const cardWidth = width * 0.8 + 30; // 卡片宽度 + 左右边距
@@ -37,12 +38,11 @@ export default function ToolSelectionScreen({ navigation }) {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+      
       <View style={styles.container}>
-        {/* 内容容器 */}
         <View style={styles.contentContainer}>
           <Text style={styles.title}>选择疗愈方式</Text>
-          <Text style={styles.subtitle}>在主界面可以选择疗愈方式</Text>
+          <Text style={styles.subtitle}>亲爱的，您很勇敢。{'\n'}记住，每一步都是向着光明前进。</Text>
 
           <ScrollView
             horizontal
@@ -60,7 +60,7 @@ export default function ToolSelectionScreen({ navigation }) {
             <TouchableOpacity onPress={() => handleCardPress('ChatScreen')}>
               <View style={styles.card}>
                 <Image
-                  source={require('../assets/icons/2x/Telegram App.png')}
+                  source={require('../assets/icons/feature-1.png')}
                   style={styles.icon}
                 />
                 <Text style={styles.cardTitle}>疗愈对话</Text>
@@ -73,7 +73,7 @@ export default function ToolSelectionScreen({ navigation }) {
             <TouchableOpacity onPress={() => handleCardPress('Meditation')}>
               <View style={styles.card}>
                 <Image
-                  source={require('../assets/icons/2x/Thinking Bubble-1.png')}
+                  source={require('../assets/icons/feature-2.png')}
                   style={styles.icon}
                 />
                 <Text style={styles.cardTitle}>引导冥想</Text>
@@ -86,7 +86,7 @@ export default function ToolSelectionScreen({ navigation }) {
             <TouchableOpacity onPress={() => handleCardPress('DeepBreathing')}>
               <View style={styles.card}>
                 <Image
-                  source={require('../assets/icons/2x/Lotus.png')}
+                  source={require('../assets/icons/feature-3.png')}
                   style={styles.icon}
                 />
                 <Text style={styles.cardTitle}>深呼吸练习</Text>
@@ -117,19 +117,13 @@ export default function ToolSelectionScreen({ navigation }) {
         {/* 底部容器 */}
         <View style={styles.footer}>
           <Text style={styles.footerText}>
-            亲爱的，您很勇敢。{'\n'}记住，每一步都是向着光明前进。
           </Text>
         </View>
       </View>
-    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: colors.background01, // 确保背景颜色一致
-  },
   container: {
     flex: 1,
     backgroundColor: colors.background01,
@@ -141,7 +135,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 0,
   },
   footer: {
-    paddingVertical: 20,
+    height: 150,
+    paddingVertical: 10,
     alignItems: 'center',
     backgroundColor: colors.background01,
   },
@@ -152,9 +147,11 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   subtitle: {
-    fontSize: 14,
+    fontSize: 16,
     color: colors.textGray600,
-    marginBottom: 10,
+    textAlign: 'center',
+    lineHeight: 24,
+    marginBottom: 0,
   },
   cardContainer: {
     alignItems: 'center',
@@ -169,30 +166,31 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginHorizontal: 15,
     padding: 40,
+    marginBottom: 10,
   },
   icon: {
-    width: 150,
-    height: 150,
+    width: 200,
+    height: 200,
     marginTop:20,
-    marginBottom: 50,
+    marginBottom: 30,
   },
   cardTitle: {
     fontSize: 24,
     fontWeight: '800',
     lineHeight: 0,    // 行高
-    letterSpacing: 0, // 字母间距
+    letterSpacing: 1.5, // 字母间距
     color: colors.textPrimary,
-    marginBottom: 20,
+    marginBottom: 10,
   },
   cardSubtitle: {
-    fontSize: 14,
+    fontSize: 16,
     textAlign: 'center',
-    lineHeight: 20,    // 行高
+    lineHeight: 24,    // 行高
     letterSpacing: 0.5, // 字母间距
     color: colors.textPrimary,
   },
   footerText: {
-    fontSize: 14,
+    fontSize: 16,
     color: colors.textGray600,
     lineHeight: 24,    // 行高
     letterSpacing: 0.5, // 字母间距
@@ -201,7 +199,7 @@ const styles = StyleSheet.create({
   },
   indicatorContainer: {
     flexDirection: 'row',
-    marginTop: 20,
+    marginTop: 0,
   },
   indicator: {
     width: 10,

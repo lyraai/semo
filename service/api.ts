@@ -1,4 +1,4 @@
-// Users/bailangcheng/Desktop/semo/service/api.ts
+// service/api.ts
 import axios from 'axios';
 import { QuestionnaireData } from '../redux/slices/questionnaireSlice';
 
@@ -40,9 +40,10 @@ export const generateUserId = async () => {
 };
 
 /**
- * 发送问卷数据
+ * 发送问卷数据（在问卷完成后发送，疗愈师默认值）
  * 
- * 将用户填写的问卷数据发送到后端
+ * @param semoUserId 用户ID
+ * @param data 问卷数据
  */
 export const sendQuestionnaireData = async (semoUserId: string, data: QuestionnaireData) => {
   if (useMock) {
@@ -50,12 +51,35 @@ export const sendQuestionnaireData = async (semoUserId: string, data: Questionna
   }
 
   try {
-    const response = await axios.post(`${BASE_URL}/api/semo/v1/user/${semoUserId}/initialise`, data); // 将 userId 添加到 URL 路径中
+    const response = await axios.post(`${BASE_URL}/api/semo/v1/user/${semoUserId}/initialise`, data); // 发送数据到后端
     return response.data;
   } catch (error) {
     console.error('Failed to send questionnaire data:', error);
     useMock = true;  // 失败后切换为模拟模式
     return mockSendQuestionnaireData(data);  // 返回模拟的响应
+  }
+};
+
+/**
+ * 发送疗愈师风格设定（用户选择疗愈师风格后再发送一次）
+ * 
+ * @param semoUserId 用户ID
+ * @param therapistStyle 用户选择的疗愈师风格
+ */
+export const updateTherapistStyle = async (semoUserId: string, therapistStyle: string) => {
+  if (useMock) {
+    return mockSendTherapistStyle(therapistStyle); // 模拟模式返回假数据
+  }
+
+  try {
+    const response = await axios.post(`${BASE_URL}/api/semo/v1/user/${semoUserId}/update-therapist`, {
+      therapist_style: therapistStyle, // 只发送风格信息
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Failed to send therapist style:', error);
+    useMock = true; // 失败后切换为模拟模式
+    return mockSendTherapistStyle(therapistStyle);
   }
 };
 
@@ -120,6 +144,18 @@ const mockGenerateUserId = async () => {
 const mockSendQuestionnaireData = async (data: QuestionnaireData) => {
   console.log('Simulated send questionnaire data:', data);
   return new Promise((resolve) => setTimeout(() => resolve({ status: 'success' }), 1000));
+};
+
+const mockSendTherapistStyle = async (style: string) => {
+  console.log('Simulated send therapist style:', style);
+  return new Promise((resolve) =>
+    setTimeout(() => resolve({
+      status: 'success',
+      content: `Simulated content for therapist style: ${style}`,
+      predicted_options: ['选项1', '选项2'],
+      topic_id: 123,
+    }), 1000)
+  );
 };
 
 const mockGetAIResponse = async (message: string) => {

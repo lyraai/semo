@@ -1,4 +1,3 @@
-// screens/Question0Screen.tsx
 import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
@@ -41,8 +40,6 @@ export default function Question0Screen({ navigation }: Props) {
       <View style={styles.progressBarContainer}>
         <ProgressBar currentStep={0} totalSteps={5} />
       </View>
-
-      {/* Content */}
       <View style={styles.contentContainer}>
         <Text style={styles.label}>请选择您的性别</Text>
         <View style={styles.genderContainer}>
@@ -54,6 +51,10 @@ export default function Question0Screen({ navigation }: Props) {
                 gender === 'male' && styles.selectedIcon
               ]}
             />
+            <Text style={[
+              styles.genderLabel,
+              gender === 'male' && styles.selectedGenderLabel
+            ]}>男</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => handleGenderSelect('female')} style={styles.genderButton}>
             <Image
@@ -63,6 +64,10 @@ export default function Question0Screen({ navigation }: Props) {
                 gender === 'female' && styles.selectedIcon
               ]}
             />
+            <Text style={[
+              styles.genderLabel,
+              gender === 'female' && styles.selectedGenderLabel
+            ]}>女</Text> 
           </TouchableOpacity>
           <TouchableOpacity onPress={() => handleGenderSelect('other')} style={styles.genderButton}>
             <Image
@@ -72,6 +77,10 @@ export default function Question0Screen({ navigation }: Props) {
                 gender === 'other' && styles.selectedIcon
               ]}
             />
+            <Text style={[
+              styles.genderLabel,
+              gender === 'other' && styles.selectedGenderLabel
+            ]}>其他</Text> 
           </TouchableOpacity>
         </View>
 
@@ -129,11 +138,11 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 18,
-    fontWeight: '500', // 控制字体粗细
-    lineHeight: 24,    // 行高
-    letterSpacing: 0.5, // 字母间距
-    color: colors.textGray600, // 设置文字颜色
-    textAlign: 'center', // 居中对齐文本
+    fontWeight: '500', 
+    lineHeight: 24,    
+    letterSpacing: 0.5,
+    color: colors.textGray600, 
+    textAlign: 'center', 
     marginVertical: 10,
   },
   genderContainer: {
@@ -141,7 +150,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginVertical: 10,
     marginBottom: 30,
-    paddingHorizontal: 40, // 调整性别选项的左右间距
+    paddingHorizontal: 40, 
   },
   genderButton: {
     alignItems: 'center',
@@ -154,6 +163,15 @@ const styles = StyleSheet.create({
   },
   selectedIcon: {
     tintColor: colors.selectedIconTint,
+  },
+  genderLabel: {
+    marginTop: 5, 
+    fontSize: 16, 
+    color: colors.textGray600, 
+    textAlign: 'center', 
+  },
+  selectedGenderLabel: {
+    color: colors.selectedIconTint, // 选中时改变颜色
   },
   ageContainer: {
     justifyContent: 'center',
@@ -183,14 +201,14 @@ const styles = StyleSheet.create({
   nextButtonText: {
     color: colors.textPrimary,
     fontSize: 18,
-    fontWeight: 'bold', // 粗体
-    textTransform: 'uppercase', // 全部大写
-    letterSpacing: 1, // 字母间距
+    fontWeight: 'bold', 
+    textTransform: 'uppercase', 
+    letterSpacing: 1, 
   },
   disabledNextButtonText: {
     color: colors.textDisabled,
     fontSize: 18,
-    fontWeight: 'bold', // 粗体
-    letterSpacing: 1, // 字母间距
+    fontWeight: 'bold', 
+    letterSpacing: 1,
   },
 });

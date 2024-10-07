@@ -4,13 +4,14 @@ export const colors = {
     black: '#000000',
 
     background: '#FFFFFF', // 背景颜色 '#FFFCF6'
-    background01:'#f7f4EE',
+    background01:'#F9F7F4',
     primary: '#E14D5A', // 主按钮颜色
     sub:'#FFC5C5',
     disabled: '#ccc', // 禁用按钮颜色
 
     textPrimary: '#fff', // 按钮文本颜色
     textBlack: '#fff', // 按钮文本颜色
+    textWhite:'#FFFFFF',
 
     textGray100: '#F7F7F7', // 最浅的灰色，接近白色
     textGray200: '#EEEEEE', 

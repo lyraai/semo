@@ -1,3 +1,4 @@
+// screens/MeditationScreen.tsx
 import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import { Video, Audio } from 'expo-av';

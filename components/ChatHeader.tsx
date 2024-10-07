@@ -1,16 +1,21 @@
-// components/DefaultHeader.tsx
+// components/ChatHeader.tsx
 import React from 'react';
 import { Icon } from 'react-native-elements';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { StyleSheet, View, Text } from 'react-native';
 import { colors } from '../styles/color';
 
-const DefaultHeader = ({ title }) => {
+const ChatHeader = ({ title }) => {
   const navigation = useNavigation();
+
+  const goToReport = () => {
+    // 跳转到 AiChatReportScreen，并发送请求获取报告
+    navigation.navigate('AiChatReportScreen');
+  };
 
   return (
     <View style={styles.container}>
-      {/* 返回按钮 */}
+      {/* 左侧返回按钮 */}
       <Icon
         name="chevron-left"
         type="feather"
@@ -19,26 +24,36 @@ const DefaultHeader = ({ title }) => {
         onPress={() => navigation.goBack()}
         containerStyle={styles.iconContainer}
       />
-      {/* 标题 */}
+
+      {/* 中间标题 */}
       <Text style={styles.title}>{title}</Text>
-      {/* 右侧占位，使标题居中 */}
-      <View style={{ width: 30 }} />
+
+      {/* 右侧报告按钮 */}
+      <TouchableOpacity onPress={goToReport}>
+        <Text style={styles.buttonText}>报告</Text>
+      </TouchableOpacity>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    height: 120, // 自定义 Header 高度
+    height: 120,
     backgroundColor: colors.background01,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 15,
- 
+    marginTop: 0, // 如果需要适配刘海屏，可以调整这个值
   },
   iconContainer: {
     marginTop: 30,
+
+  },
+  buttonText: {
+    marginTop: 30,
+    color: colors.primary,
+    fontSize: 16,
   },
   title: {
     marginTop: 30,
@@ -48,4 +63,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default DefaultHeader;
+export default ChatHeader;

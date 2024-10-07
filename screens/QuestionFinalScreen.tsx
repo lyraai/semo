@@ -1,12 +1,13 @@
 // screens/QuestionFinalScreen.tsx
-import React, { useState } from 'react';
-import { Alert, View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
-import { useSelector } from 'react-redux';
+import React, { useState, useEffect, useRef } from 'react';
+import { Alert, View, Text, TouchableOpacity, StyleSheet, ScrollView, Animated } from 'react-native';
+import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../redux/store';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../App';
-import { checkBackendConnection } from '../service/api';
+import { checkBackendConnection, sendQuestionnaireData } from '../service/api';
 import { colors } from '../styles/color';
+import { updateAnswer } from '../redux/slices/questionnaireSlice'; // 引入 updateAnswer
 import ProgressBar from '../components/ProgressBar'; // 引入进度条组件
 
 type FinalScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'FinalScreen'>;
@@ -19,6 +20,26 @@ export default function QuestionFinalScreen({ navigation }: Props) {
   const questionnaireData = useSelector((state: RootState) => state.questionnaire);
   const userId = useSelector((state: RootState) => state.user.userId);  // 从 Redux 中获取 userId
   const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useDispatch(); // 使用 dispatch 来更新 Redux 状态
+
+  // 创建一个动画值数组
+  const animations = useRef([new Animated.Value(0), new Animated.Value(0)]).current;
+
+  useEffect(() => {
+    // 当组件挂载时，启动动画
+    Animated.stagger(300, [
+      Animated.timing(animations[0], {
+        toValue: 1,
+        duration: 500,
+        useNativeDriver: true,
+      }),
+      Animated.timing(animations[1], {
+        toValue: 1,
+        duration: 500,
+        useNativeDriver: true,
+      })
+    ]).start();
+  }, [animations]);
 
   const handleStartChat = async () => {
     if (!userId) {
@@ -29,12 +50,22 @@ export default function QuestionFinalScreen({ navigation }: Props) {
     setIsLoading(true);
     try {
       await checkBackendConnection();  // 检查后端连接
-      navigation.navigate('ToolSelectionScreen', {
-        userId,
-        questionnaireData,
+
+      // 设置疗愈师风格为默认值，例如 '温暖' 或 '默认'
+      const defaultTherapistStyle = '默认';
+      dispatch(updateAnswer({ question: 'therapist_style', answer: defaultTherapistStyle }));
+
+      // 将更新后的问卷数据发送到后端
+      await sendQuestionnaireData(userId, {
+        ...questionnaireData,
+        therapist_style: defaultTherapistStyle,
       });
+
+      // 导航到主界面
+      navigation.navigate('Home');
     } catch (error) {
-      console.error('跳转到疗愈工具选择页面失败:', error);
+      console.error('初始化失败:', error);
+      Alert.alert('错误', '初始化失败，请稍后重试');
     } finally {
       setIsLoading(false);
     }
@@ -47,15 +78,32 @@ export default function QuestionFinalScreen({ navigation }: Props) {
         <ProgressBar currentStep={5} totalSteps={5} />
       </View>
 
-      {/* Content */}
       <ScrollView contentContainerStyle={styles.contentContainer}>
-        <Text style={styles.header}>问卷完成</Text>
-        <Text style={styles.summary}>感谢您完成问卷！</Text>
-        <Text style={styles.summary}>您选择的答案：</Text>
-        <Text style={styles.text}>关系状态: {questionnaireData.current_state}</Text>
-        <Text style={styles.text}>分开时长: {questionnaireData.duration}</Text>
-        <Text style={styles.text}>当前感受: {questionnaireData.current_feeling}</Text>
-        <Text style={styles.text}>想要的结果: {questionnaireData.expectation}</Text>
+        {/* 感谢您的回答 Container */}
+        <Animated.View style={[styles.summaryContainer, { opacity: animations[0] }]}>
+          <Text style={styles.summaryText}>感谢您完成问卷！</Text>
+        </Animated.View>
+
+        {/* 问题和答案 Container */}
+        <Animated.View style={[styles.answersContainer, { opacity: animations[1] }]}>
+          <Text style={styles.answersHeader}>您选择的答案：</Text>
+          <View style={styles.qaContainer}>
+            <Text style={styles.questionText}>关系状态: </Text>
+            <Text style={styles.answerText}>{questionnaireData.current_state}</Text>
+          </View>
+          <View style={styles.qaContainer}>
+            <Text style={styles.questionText}>分开时长: </Text>
+            <Text style={styles.answerText}>{questionnaireData.duration}</Text>
+          </View>
+          <View style={styles.qaContainer}>
+            <Text style={styles.questionText}>当前感受: </Text>
+            <Text style={styles.answerText}>{questionnaireData.current_feeling}</Text>
+          </View>
+          <View style={styles.qaContainer}>
+            <Text style={styles.questionText}>想要的结果: </Text>
+            <Text style={styles.answerText}>{questionnaireData.expectation}</Text>
+          </View>
+        </Animated.View>
       </ScrollView>
 
       {/* Bottom Button */}
@@ -66,7 +114,7 @@ export default function QuestionFinalScreen({ navigation }: Props) {
           disabled={isLoading}  // 禁用按钮防止重复点击
         >
           <Text style={[styles.nextButtonText, isLoading && styles.disabledNextButtonText]}>
-            {isLoading ? '加载中...' : '选择疗愈方式'}
+            {isLoading ? '加载中...' : '开始心理疗愈之旅'}
           </Text>
         </TouchableOpacity>
       </View>
@@ -85,28 +133,51 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flexGrow: 1,
-    alignItems: 'center',
     paddingHorizontal: 20,
-    marginVertical: 20,
+    marginVertical: 10,
   },
-  header: {
+  // 小container：感谢您的回答
+  summaryContainer: {
+    marginBottom: 50,
+    marginHorizontal: 20,
+
+  },
+  summaryText: {
     fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
-    color: colors.textGray600,
+    color: colors.primary,
+    fontWeight: '600',
+    letterSpacing: 1.2,
   },
-  summary: {
+  // 小container：问题和答案
+  answersContainer: {
+    alignItems: 'flex-start',
+  },
+  answersHeader: {
     fontSize: 18,
-    marginBottom: 10,
-    textAlign: 'center',
-    color: colors.textGray600,
+    marginBottom: 20,
+    color: colors.textGray500,  // 使用深灰色
+    letterSpacing: 1.2,
+    lineHeight: 24,
+    marginHorizontal: 20,
   },
-  text: {
-    fontSize: 16,
-    marginBottom: 5,
-    textAlign: 'center',
+  qaContainer: {
+    flexDirection: 'row',
+    marginBottom:15,
+    marginHorizontal: 20,
+  },
+  // 样式：问题（关系状态等）
+  questionText: {
+    fontSize: 18,
     color: colors.textGray500,
+    letterSpacing: 1.0,
+    lineHeight: 22,
+  },
+  // 样式：用户的答案，使用主题色
+  answerText: {
+    fontSize: 18,
+    color: colors.primary,
+    letterSpacing: 1.0,
+    lineHeight: 22,
   },
   bottomButtonContainer: {
     height: 150,
@@ -126,15 +197,17 @@ const styles = StyleSheet.create({
   },
   nextButtonText: {
     color: colors.textPrimary,
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
     textTransform: 'uppercase',
-    letterSpacing: 1,
+    letterSpacing: 2.0,
+    lineHeight: 20,
   },
   disabledNextButtonText: {
     color: colors.textDisabled,
     fontSize: 18,
     fontWeight: 'bold',
-    letterSpacing: 1,
+    letterSpacing: 2.0,
+    lineHeight: 20,
   },
 });

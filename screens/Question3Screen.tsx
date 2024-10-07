@@ -77,7 +77,7 @@ export default function Question3Screen({ navigation }: Props) {
           positionStyle,
           {
             borderColor: borderColor,
-            borderWidth: 1.5,
+            borderWidth: 0,
             backgroundColor: isSelected
               ? `rgba(225,77,90,${getButtonAlpha(level)})`
               : 'transparent',
@@ -107,14 +107,14 @@ export default function Question3Screen({ navigation }: Props) {
 
   // 定义按钮的位置
   const buttonPositions = [
-    { title: '思念', top: 0, left: 50 },
-    { title: '孤独', top: 0, left: 180 },
-    { title: '迷茫', top: 100, left: 100 },
-    { title: '内疚', top: 100, left: 230 },
-    { title: '心痛', top: 200, left: 50 },
-    { title: '愤怒', top: 200, left: 180 },
-    { title: '希望', top: 300, left: 100 },
-    { title: '解脱', top: 300, left: 230 },
+    { title: '思念', top: 0, left: 25 },
+    { title: '孤独', top: 0, left: 155 },
+    { title: '迷茫', top: 100, left: 75 },
+    { title: '内疚', top: 100, left: 215 },
+    { title: '心痛', top: 200, left: 25 },
+    { title: '愤怒', top: 200, left: 155 },
+    { title: '希望', top: 300, left: 75 },
+    { title: '解脱', top: 300, left: 215 },
   ];
 
   return (
@@ -166,24 +166,24 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
     color: colors.textGray600,
     textAlign: 'center',
-    marginVertical: 30,
+    marginVertical: 15,
   },
   optionsContainer: {
     width: '100%',
-    height: 400, // 调整高度以适应按钮
+    height: 300, // 调整高度以适应按钮
     position: 'relative',
   },
   button: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: 120,
+    height: 120,
+    borderRadius: 100,
     position: 'absolute',
     justifyContent: 'center',
     alignItems: 'center',
     // 背景颜色在 renderButton 中动态设置
   },
   buttonText: {
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: 'bold',
     textAlign: 'center',
   },

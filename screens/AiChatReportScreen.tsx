@@ -113,7 +113,7 @@ export default function AiChatReportScreen({ route }) {
 
         {/* 第三部分：总结和建议 */}
         <View style={styles.summaryContainer}>
-          <Text style={styles.sectionTitle}>Semo 总结</Text>
+          <Text style={styles.sectionTitle}>对话总结</Text>
           <Text style={styles.summaryText}>{summary}</Text>
           {recommendations.length > 0 && (
             <View style={styles.recommendationsContainer}>
@@ -126,7 +126,7 @@ export default function AiChatReportScreen({ route }) {
 
         {/* 第四部分：情绪变化图表 */}
         <View style={styles.chartContainer}>
-          <Text style={styles.sectionTitle}>本次聊天中的情绪变化</Text>
+          <Text style={styles.sectionTitle}>情绪变化</Text>
           {emotion_list.length > 0 ? (
             <View style={{ height: 150, flexDirection: 'row', alignItems: 'center' }}>
               {/* 左侧竖着显示悲伤到笑脸的图标 */}
@@ -156,21 +156,7 @@ export default function AiChatReportScreen({ route }) {
           )}
         </View>
 
-        {/* 底部操作栏 */}
-        <View style={styles.footer}>
-          <TouchableOpacity style={styles.footerButton}>
-            <Icon name="history" type="material" color={colors.primary} />
-            <Text style={styles.footerButtonText}>历史</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.footerButton}>
-            <Icon name="chatbubble-outline" type="ionicon" color={colors.primary} />
-            <Text style={styles.footerButtonText}>继续聊天</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.footerButton}>
-            <Icon name="trash-outline" type="ionicon" color={colors.primary} />
-            <Text style={styles.footerButtonText}>删除</Text>
-          </TouchableOpacity>
-        </View>
+        
       </ScrollView>
     </ErrorBoundary>
   );
