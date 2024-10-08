@@ -17,14 +17,15 @@ const HomeHeader = () => {
 
 const styles = StyleSheet.create({
   container: {
-    height: 140, // 自定义 Header 高度
+    height: 100, // 自定义 Header 高度
     backgroundColor: colors.background01,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 0,
   },
   logo: {
-    marginTop: 30,
+    marginTop: 50,
+    marginBottom:0,
     width: 100, // 自定义 Logo 宽度
     height: 40, // 自定义 Logo 高度
   },

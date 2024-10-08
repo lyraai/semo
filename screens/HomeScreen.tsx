@@ -2,7 +2,6 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { colors } from '../styles/color'; 
 import CalendarHeader from '../components/CalenderHeader'; 
-import HomeHeader from '../components/HomeHeader'; 
 
 export default function HomeScreen() {
   return (

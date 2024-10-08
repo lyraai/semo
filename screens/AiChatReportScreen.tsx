@@ -1,4 +1,4 @@
-// /Users/bailangcheng/Desktop/dev/semo/screens/AiChatReportScreen.tsx
+//screens/AiChatReportScreen.tsx
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, Image } from 'react-native';
 import { Icon } from 'react-native-elements';

@@ -34,16 +34,6 @@ export default function WelcomeScreen({ navigation }: Props) {
     checkConnection();
   }, [dispatch]);
 
-  const handleGenerateUserId = async () => {
-    try {
-      const id = await generateUserId();
-      dispatch(updateUserId(id));
-      Alert.alert('用户ID生成成功', `生成的用户ID: ${id}`);
-    } catch (error) {
-      Alert.alert('生成用户ID失败', '请检查网络连接或后端状态');
-    }
-  };
-
   // 动态文字透明度变化效果
   useEffect(() => {
     Animated.loop(
@@ -85,7 +75,7 @@ export default function WelcomeScreen({ navigation }: Props) {
         {userId ? (
           <Text style={styles.userIdText}>当前用户ID: {userId}</Text>
         ) : (
-          <Button title="生成用户ID" onPress={handleGenerateUserId} color="#4CAF50" />
+          <Button title="生成用户ID" onPress={generateUserId} color="#4CAF50" />
         )}
       </View>
 

@@ -4,7 +4,6 @@ import { Alert, View, Text, TouchableOpacity, StyleSheet, ScrollView, Animated }
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../redux/store';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../App';
 import { checkBackendConnection, sendQuestionnaireData } from '../service/api';
 import { colors } from '../styles/color';
 import { updateAnswer } from '../redux/slices/questionnaireSlice'; // 引入 updateAnswer
@@ -46,7 +45,7 @@ export default function QuestionFinalScreen({ navigation }: Props) {
       Alert.alert('错误', '无法找到用户ID');
       return;
     }
-  
+
     setIsLoading(true);
     try {
       await checkBackendConnection();  // 检查后端连接
@@ -56,10 +55,19 @@ export default function QuestionFinalScreen({ navigation }: Props) {
       dispatch(updateAnswer({ question: 'therapist_style', answer: defaultTherapistStyle }));
 
       // 将更新后的问卷数据发送到后端
-      await sendQuestionnaireData(userId, {
+      const response = await sendQuestionnaireData(userId, {
         ...questionnaireData,
         therapist_style: defaultTherapistStyle,
       });
+
+      // 打印服务器返回的消息
+      console.log('Questionnaire data sent successfully:', response);
+
+      if (response && response.message) {
+        console.log('Server Response:', response.message);
+      } else {
+        console.log('No response message from server.');
+      }
 
       // 导航到主界面
       navigation.navigate('Home');

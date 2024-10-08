@@ -54,7 +54,7 @@ export default function Question0Screen({ navigation }: Props) {
             <Text style={[
               styles.genderLabel,
               gender === 'male' && styles.selectedGenderLabel
-            ]}>男</Text>
+            ]}>男性</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => handleGenderSelect('female')} style={styles.genderButton}>
             <Image
@@ -67,7 +67,7 @@ export default function Question0Screen({ navigation }: Props) {
             <Text style={[
               styles.genderLabel,
               gender === 'female' && styles.selectedGenderLabel
-            ]}>女</Text> 
+            ]}>女性</Text> 
           </TouchableOpacity>
           <TouchableOpacity onPress={() => handleGenderSelect('other')} style={styles.genderButton}>
             <Image
@@ -165,8 +165,8 @@ const styles = StyleSheet.create({
     tintColor: colors.selectedIconTint,
   },
   genderLabel: {
-    marginTop: 5, 
-    fontSize: 16, 
+    marginTop: 10, 
+    fontSize: 14, 
     color: colors.textGray600, 
     textAlign: 'center', 
   },

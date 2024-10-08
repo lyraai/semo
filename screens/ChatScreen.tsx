@@ -1,4 +1,4 @@
-// /screens/ChatScreen.tsx
+// screens/ChatScreen.tsx
 import React, { useState, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../redux/store';
@@ -20,7 +20,6 @@ import { getAIResponse } from '../service/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { colors } from '../styles/color';
-import { color } from 'react-native-elements/dist/helpers';
 
 type Message = { sender: 'user' | 'ai'; text: string };
 
@@ -44,6 +43,7 @@ export default function ChatScreen() {
 
   const semoUserId = useSelector((state: RootState) => state.user.userId);
 
+  // 获取用户 ID
   useEffect(() => {
     const fetchUserId = async () => {
       try {
@@ -61,26 +61,29 @@ export default function ChatScreen() {
     }
   }, [semoUserId, dispatch]);
 
+  // 设置初始消息、选项和 topicId
   useEffect(() => {
     const { initialMessage, initialOptions, initialTopicId } = route.params || {};
 
     if (initialMessage) {
-      setMessages([{ sender: 'ai', text: initialMessage }]);
+      setMessages([{ sender: 'ai', text: initialMessage }]); // 添加AI初始消息
     }
 
     if (initialOptions) {
-      setPredictedOptions(initialOptions);
+      setPredictedOptions(initialOptions); // 设置初始的选项
     }
 
     if (initialTopicId !== undefined) {
-      setTopicId(initialTopicId);
+      setTopicId(initialTopicId); // 设置 topic ID
     }
   }, [route.params]);
 
+  // 滚动到末尾
   useEffect(() => {
     scrollViewRef.current?.scrollToEnd({ animated: true });
   }, [messages]);
 
+  // 发送消息函数
   const sendMessage = async () => {
     if (!semoUserId) {
       console.error('No User ID available');
@@ -113,10 +116,12 @@ export default function ChatScreen() {
     }
   };
 
+  // 处理选项点击
   const handleOptionPress = (option: string) => {
     setInputText(option);
   };
 
+  // 根据情绪值设置颜色
   const getEmotionColor = (emotionValue: number | null) => {
     if (emotionValue === null) return colors.white;
     if (emotionValue > 0.75) return colors.sub;
@@ -201,6 +206,7 @@ export default function ChatScreen() {
   );
 }
 
+// 样式定义
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -293,8 +299,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderRadius: 25,
     paddingHorizontal: 10,
-    paddingVertical: 10,
-    
+    paddingVertical: 8,
   },
   plusButton: {
     padding: 5,
@@ -308,9 +313,8 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    paddingTop: 0,
     fontSize: 17,
-    maxHeight: 100, // 限制最大高度
+    maxHeight: 100,
     marginHorizontal: 10,
     marginBottom:5,
   },
