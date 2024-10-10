@@ -7,9 +7,7 @@ import { generateUserId, checkBackendConnection } from './service/api';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import WelcomeScreen from './screens/WelcomeScreen';
-import HomeScreen from './screens/HomeScreen';
-import ProfileScreen from './screens/profile/ProfileScreen';
-import { TabNavigator } from './TabNavigator'; // 导入 TabNavigator
+import { TabNavigator } from './navigation/TabNavigator'; 
 import Question0Screen from './screens/Question0Screen';
 import Question1Screen from './screens/Question1Screen';
 import Question2Screen from './screens/Question2Screen';

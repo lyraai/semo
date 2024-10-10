@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { updateUserId, loadUserIdFromStorage } from '../redux/slices/userSlice';
 import { colors } from '../styles/color';
 import Constants from 'expo-constants';
-import { RootState } from '../redux/store'; // 确保您有这个导入
+import { RootState } from '../redux/store'; 
 
 type WelcomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Welcome'>;
 
@@ -63,8 +63,8 @@ export default function WelcomeScreen({ navigation }: Props) {
       {/* 顶部Logo和欢迎信息 */}
       <View style={styles.topSection}>
         <Image source={require('../assets/logos/1x/logo.png')} style={styles.logo} />
-        <Text style={styles.title}>欢迎来到Semo心茉</Text>
-        <Text style={styles.subtitle}>你的情绪急救助手 version: {version} (build: {buildNumber})</Text>
+        <Text style={styles.title}>semo</Text>
+        <Text style={styles.subtitle}>version: {version} (build: {buildNumber})</Text>
       </View>
 
       {/* 固定高度的测试信息 */}
@@ -73,17 +73,24 @@ export default function WelcomeScreen({ navigation }: Props) {
           <Text style={styles.connectionStatus}>{connectionStatus}</Text>
         )}
         {userId ? (
-          <Text style={styles.userIdText}>当前用户ID: {userId}</Text>
+          <Text style={styles.userIdText}>ID: {userId}</Text>
         ) : (
           <Button title="生成用户ID" onPress={generateUserId} color="#4CAF50" />
         )}
       </View>
 
       {/* 底部固定按钮 */}
-      <View style={styles.bottomSection}>
+      <View style={styles.signupSection}>
         <TouchableOpacity onPress={() => navigation.navigate('Question0')}>
-          <Animated.Text style={[styles.startButtonText, { opacity: textOpacity }]}>
-            开始
+          <Animated.Text style={[styles.signupText, { opacity: textOpacity }]}>
+            注册
+          </Animated.Text>
+        </TouchableOpacity>
+      </View>
+      <View style={styles.loginSection}>
+        <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+          <Animated.Text style={[styles.loginText, { opacity: textOpacity }]}>
+            登录
           </Animated.Text>
         </TouchableOpacity>
       </View>
@@ -97,11 +104,11 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background01,
   },
   topSection: {
-    flex: 9, // 顶部部分占据较大空间
+    flex: 12, // 顶部部分占据较大空间
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingTop: 20,
+    paddingTop: 100,
   },
   logo: {
     width: 300,
@@ -109,10 +116,10 @@ const styles = StyleSheet.create({
     marginBottom: 0,
   },
   title: {
-    fontSize: 24,
+    fontSize: 60,
     fontWeight: 'bold',
     color: colors.primary,
-    marginBottom: 10,
+    marginBottom: 0,
   },
   subtitle: {
     fontSize: 14,
@@ -123,35 +130,47 @@ const styles = StyleSheet.create({
     flex: 1, // 中间部分固定高度
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 20,
+    marginHorizontal: 20,
+    paddingHorizontal: 0,
+    marginBottom: 30,
   },
   connectionStatus: {
     fontSize: 14,
     color: colors.textGray500,
-    marginBottom: 20,
-    textAlign: 'center',
+    marginBottom: 0,
+    textAlign: 'left',
   },
   userIdText: {
     fontSize: 14,
     color: colors.textGray500,
-    marginBottom: 20,
-    textAlign: 'center',
+    marginBottom: 0,
+    textAlign: 'left',
   },
-  bottomSection: {
-    flex: 1, // 底部部分固定空间
+  signupSection: {
+    flex: 1, 
+    backgroundColor: colors.primary,
+    borderRadius:25,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 40, 
+    marginHorizontal: 120,
+  },
+  loginSection: {
+    flex: 1,
     justifyContent: 'flex-end',
     alignItems: 'center',
-    paddingBottom: 30, // 合理的底部内边距
+    paddingBottom: 0,
+    marginBottom: 40,
   },
-  startButtonText: {
+  signupText: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: colors.primary,
+    color: colors.white,
   },
-  homeButtonText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: colors.primary,
+  loginText: {
+    fontSize: 20,
+    fontWeight: 'regular',
+    color: colors.textGray600,
     marginTop: 10, // 和“开始”按钮之间保持间距
   },
 });
