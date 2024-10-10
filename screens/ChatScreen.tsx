@@ -176,7 +176,7 @@ export default function ChatScreen() {
       <View style={styles.footerContainer}>
         <View style={styles.inputWrapper}>
           <TouchableOpacity style={styles.plusButton}>
-            <Image source={require('../assets/icons/1x/plus.png')} style={styles.plusIcon} />
+            <Image source={require('../assets/icons/2x/plus.png')} style={styles.plusIcon} />
           </TouchableOpacity>
           <TextInput
             style={styles.input}
@@ -193,7 +193,7 @@ export default function ChatScreen() {
             disabled={!inputText.trim()}
           >
             <Image
-              source={require('../assets/icons/1x/Sending.png')}
+              source={require('../assets/icons/2x/Sending.png')}
               style={[
                 styles.sendIcon,
                 { tintColor: inputText.trim() ? colors.primary : colors.gray300 },

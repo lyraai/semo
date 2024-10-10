@@ -21,15 +21,15 @@ export function TabNavigator() {
           let iconSource;
 
           if (route.name === '主页') {
-            iconSource = require('./assets/icons/1x/Home-1.png');
+            iconSource = require('./assets/icons/2x/Home-1.png');
           } else if (route.name === '发现') {
-            iconSource = require('./assets/icons/1x/Search.png');
+            iconSource = require('./assets/icons/2x/Search.png');
           } else if (route.name === '疗愈') {
-            iconSource = require('./assets/icons/1x/Healingtool.png');
+            iconSource = require('./assets/icons/2x/Healingtool.png');
           } else if (route.name === '记录') {
-            iconSource = require('./assets/icons/1x/MoodJourney.png');
+            iconSource = require('./assets/icons/2x/MoodJourney.png');
           } else if (route.name === '用户') {
-            iconSource = require('./assets/icons/1x/Profile.png');
+            iconSource = require('./assets/icons/2x/Profile.png');
           }
 
           return (

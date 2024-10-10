@@ -45,7 +45,7 @@ export default function Question0Screen({ navigation }: Props) {
         <View style={styles.genderContainer}>
           <TouchableOpacity onPress={() => handleGenderSelect('male')} style={styles.genderButton}>
             <Image
-              source={require('../assets/icons/1x/Male.png')}
+              source={require('../assets/icons/2x/Male.png')}
               style={[
                 styles.genderIcon,
                 gender === 'male' && styles.selectedIcon
@@ -58,7 +58,7 @@ export default function Question0Screen({ navigation }: Props) {
           </TouchableOpacity>
           <TouchableOpacity onPress={() => handleGenderSelect('female')} style={styles.genderButton}>
             <Image
-              source={require('../assets/icons/1x/Female.png')}
+              source={require('../assets/icons/2x/Female.png')}
               style={[
                 styles.genderIcon,
                 gender === 'female' && styles.selectedIcon
@@ -71,7 +71,7 @@ export default function Question0Screen({ navigation }: Props) {
           </TouchableOpacity>
           <TouchableOpacity onPress={() => handleGenderSelect('other')} style={styles.genderButton}>
             <Image
-              source={require('../assets/icons/1x/OtherGender.png')}
+              source={require('../assets/icons/2x/OtherGender.png')}
               style={[
                 styles.genderIcon,
                 gender === 'other' && styles.selectedIcon
