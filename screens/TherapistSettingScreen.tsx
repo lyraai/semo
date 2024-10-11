@@ -8,6 +8,7 @@ import { useNavigation } from '@react-navigation/native';
 import { colors } from '../styles/color';
 import { updateAnswer } from '../redux/slices/questionnaireSlice';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { t, languageCode } from '../locales/localization';
 
 // 定义导航参数的类型
 type RootStackParamList = {
@@ -31,7 +32,7 @@ export default function TherapistSettingScreen() {
   useEffect(() => {
     const fetchStyles = async () => {
       if (!semoUserId) {
-        Alert.alert('错误', '无法获取用户ID');
+        Alert.alert(t('error'), t('unable_to_get_user_id'));
         setLoading(false);
         return;
       }
@@ -43,7 +44,7 @@ export default function TherapistSettingScreen() {
         setSelectedStyle(data.current_style);
       } catch (error) {
         console.error('获取疗愈师风格失败:', error);
-        Alert.alert('错误', '无法获取疗愈师风格列表');
+        Alert.alert(t('error'), t('unable_to_get_therapist_style_list'));
       } finally {
         setLoading(false);
       }
@@ -86,12 +87,12 @@ export default function TherapistSettingScreen() {
   // 确认选择并开始聊天
   const handleConfirm = async () => {
     if (!semoUserId) {
-      Alert.alert('错误', '无法获取用户ID');
+      Alert.alert(t('error'), t('unable_to_get_user_id'));
       return;
     }
 
     if (!selectedStyle) {
-      Alert.alert('提示', '请先选择一个疗愈师风格');
+      Alert.alert(t('prompt'), t('please_select_therapist_style'));
       return;
     }
 
@@ -112,7 +113,7 @@ export default function TherapistSettingScreen() {
       });
     } catch (error) {
       console.error('开始聊天失败:', error);
-      Alert.alert('错误', '无法开始聊天');
+      Alert.alert(t('error'), t('unable_to_start_chat'));
     }
   };
 
@@ -187,7 +188,7 @@ export default function TherapistSettingScreen() {
               !selectedStyle && styles.disabledButtonText,
             ]}
           >
-            开始对话
+            {t('start_conversation')}
           </Text>
         </TouchableOpacity>
       </View>

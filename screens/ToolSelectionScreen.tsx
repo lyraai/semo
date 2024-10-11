@@ -8,12 +8,12 @@ import {
   Image,
   TouchableOpacity,
   Dimensions,
-  Alert,
   Animated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../styles/color';
 import HomeHeader from '../components/HomeHeader';
+import { t, languageCode } from '../locales/localization';
 
 const { width } = Dimensions.get('window');
 const cardWidth = width * 0.8 + 30; // 卡片宽度 + 左右边距
@@ -41,8 +41,8 @@ export default function ToolSelectionScreen({ navigation }) {
       
       <View style={styles.container}>
         <View style={styles.contentContainer}>
-          <Text style={styles.title}>选择疗愈方式</Text>
-          <Text style={styles.subtitle}>亲爱的，您很勇敢。{'\n'}记住，每一步都是向着光明前进。</Text>
+          <Text style={styles.title}>{t('choose_healing_method')}</Text>
+          <Text style={styles.subtitle}>{t('healing_subtitle')}</Text>
 
           <ScrollView
             horizontal
@@ -63,9 +63,9 @@ export default function ToolSelectionScreen({ navigation }) {
                   source={require('../assets/icons/feature-1.png')}
                   style={styles.icon}
                 />
-                <Text style={styles.cardTitle}>疗愈对话</Text>
+                <Text style={styles.cardTitle}>{t('healing_chat')}</Text>
                 <Text style={styles.cardSubtitle}>
-                  与疗愈师进行温暖的对话，{"\n"}倾诉您的感受
+                  {t('healing_chat_description')}
                 </Text>
               </View>
             </TouchableOpacity>
@@ -76,9 +76,9 @@ export default function ToolSelectionScreen({ navigation }) {
                   source={require('../assets/icons/feature-2.png')}
                   style={styles.icon}
                 />
-                <Text style={styles.cardTitle}>引导冥想</Text>
+                <Text style={styles.cardTitle}>{t('guided_meditation')}</Text>
                 <Text style={styles.cardSubtitle}>
-                  通过冥想练习{"\n"}平静心灵，缓解情绪
+                  {t('guided_meditation_description')}
                 </Text>
               </View>
             </TouchableOpacity>
@@ -89,9 +89,9 @@ export default function ToolSelectionScreen({ navigation }) {
                   source={require('../assets/icons/feature-3.png')}
                   style={styles.icon}
                 />
-                <Text style={styles.cardTitle}>深呼吸练习</Text>
+                <Text style={styles.cardTitle}>{t('deep_breathing')}</Text>
                 <Text style={styles.cardSubtitle}>
-                  学习深呼吸技巧，{"\n"}快速舒缓情绪
+                  {t('deep_breathing_description')}
                 </Text>
               </View>
             </TouchableOpacity>

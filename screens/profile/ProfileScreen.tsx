@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import { colors } from '../../styles/color';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { t, languageCode } from '../../locales/localization';
 
 export default function ProfileScreen() {
   const [userInfo, setUserInfo] = useState<any>(null);
@@ -57,6 +58,11 @@ export default function ProfileScreen() {
     navigation.navigate('TherapistSettingScreen');
   };
 
+  const handleLogout = () => {
+    // 这里可以添加登出逻辑，比如清除用户状态等
+    navigation.navigate('Welcome' as never);
+  };
+
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -80,48 +86,59 @@ export default function ProfileScreen() {
           source={require('../../assets/icons/default-avatar.png')}
           style={styles.avatar}
         />
-        <Text style={styles.userName}>{userInfo.username || '用户名'}</Text> 
+        <View style={styles.userInfoContainer}>
+          <Text style={styles.userName}>{userInfo.username || t('default_username')}</Text>
+          <TouchableOpacity onPress={handleLogout}>
+            <Text style={styles.logoutText}>{t('logout')}</Text>
+          </TouchableOpacity>
+        </View>
         <TouchableOpacity style={styles.editButton} onPress={handleEditProfile}>
-          <Text style={styles.editButtonText}>编辑个人信息</Text>
+          <Text style={styles.editButtonText}>{t('edit_profile')}</Text>
         </TouchableOpacity>
+        
       </View>
 
       <View style={styles.infoSection}>
-        <Text style={styles.sectionTitle}>基本信息</Text>
+        <Text style={styles.sectionTitle}>{t('basic_info')}</Text>
         <View style={styles.infoItem}>
-          <Text style={styles.infoLabel}>年龄：</Text>
-          <Text style={styles.infoValue}>{userInfo.age != null ? userInfo.age : '未填写'}</Text>
+          <Text style={styles.infoLabel}>{t('age')}：</Text>
+          <Text style={styles.infoValue}>{userInfo.age != null ? userInfo.age : t('not_filled')}</Text>
         </View>
         <View style={styles.infoItem}>
-          <Text style={styles.infoLabel}>性别：</Text>
-          <Text style={styles.infoValue}>{userInfo.gender || '未填写'}</Text>
+          <Text style={styles.infoLabel}>{t('gender')}：</Text>
+          <Text style={styles.infoValue}>{userInfo.gender || t('not_filled')}</Text>
         </View>
         <View style={styles.infoItem}>
-          <Text style={styles.infoLabel}>当前感受：</Text>
-          <Text style={styles.infoValue}>{userInfo.current_feeling || '未填写'}</Text>
+          <Text style={styles.infoLabel}>{t('current_feeling')}：</Text>
+          <Text style={styles.infoValue}>{userInfo.current_feeling || t('not_filled')}</Text>
         </View>
         <View style={styles.infoItem}>
-          <Text style={styles.infoLabel}>当前状态：</Text>
-          <Text style={styles.infoValue}>{userInfo.current_state || '未填写'}</Text>
+          <Text style={styles.infoLabel}>{t('current_state')}：</Text>
+          <Text style={styles.infoValue}>{userInfo.current_state || t('not_filled')}</Text>
         </View>
         <View style={styles.infoItem}>
-          <Text style={styles.infoLabel}>期望疗程：</Text>
-          <Text style={styles.infoValue}>{userInfo.duration || '未填写'}</Text>
+          <Text style={styles.infoLabel}>{t('expected_duration')}：</Text>
+          <Text style={styles.infoValue}>{userInfo.duration || t('not_filled')}</Text>
         </View>
         <View style={styles.infoItem}>
-          <Text style={styles.infoLabel}>期望：</Text>
-          <Text style={styles.infoValue}>{userInfo.expectation || '未填写'}</Text>
+          <Text style={styles.infoLabel}>{t('expectation')}：</Text>
+          <Text style={styles.infoValue}>{userInfo.expectation || t('not_filled')}</Text>
+        </View>
+        {/* 添加当前系统语言显示 */}
+        <View style={styles.infoItem}>
+          <Text style={styles.infoLabel}>{t('current_language')}：</Text>
+          <Text style={styles.infoValue}>{t(languageCode)}</Text>
         </View>
       </View>
 
       <View style={styles.infoSection}>
-        <Text style={styles.sectionTitle}>疗愈师风格</Text>
+        <Text style={styles.sectionTitle}>{t('therapist_style')}</Text>
         <View style={styles.infoItem}>
-          <Text style={styles.infoLabel}>当前风格：</Text>
-          <Text style={styles.infoValue}>{userInfo.therapist_style || '未选择'}</Text>
+          <Text style={styles.infoLabel}>{t('current_style')}：</Text>
+          <Text style={styles.infoValue}>{userInfo.therapist_style || t('not_selected')}</Text>
         </View>
         <TouchableOpacity style={styles.changeStyleButton} onPress={handleChangeTherapistStyle}>
-          <Text style={styles.changeStyleButtonText}>修改疗愈师风格</Text>
+          <Text style={styles.changeStyleButtonText}>{t('change_therapist_style')}</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
@@ -165,11 +182,21 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     marginBottom: 15,
   },
+  userInfoContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
   userName: {
     fontSize: 22,
     fontWeight: '600',
     color: colors.textGray700,
-    marginBottom: 10,
+    marginRight: 10,
+  },
+  logoutText: {
+    fontSize: 16,
+    color: colors.primary,
+    textDecorationLine: 'underline',
   },
   editButton: {
     backgroundColor: colors.sub,
@@ -221,4 +248,15 @@ const styles = StyleSheet.create({
     color: colors.white,
     fontSize: 16,
   },
+  logoutButton: {
+    alignSelf: 'center',
+    marginTop: 20,
+    marginBottom: 30,
+  },
+  logoutButtonText: {
+    color: colors.danger,
+    fontSize: 18,
+    fontWeight: '600',
+  },
 });
+
