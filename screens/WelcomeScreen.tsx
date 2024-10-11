@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet, Button, Alert, Platform, TouchableOpacity, Animated, SafeAreaView } from 'react-native';
+import { View, Text, Image, StyleSheet, Button, Alert, Platform, TouchableOpacity, Animated, SafeAreaView, NativeModules } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../App';
 import { checkBackendConnection, generateUserId } from '../service/api';
@@ -58,13 +58,21 @@ export default function WelcomeScreen({ navigation }: Props) {
     android: Constants.expoConfig?.android?.versionCode?.toString(),
   }) || '未知';
 
+  // 获取设备语言并转换为缩写
+  const deviceLanguage =
+    Platform.OS === 'ios'
+      ? NativeModules.SettingsManager.settings.AppleLocale
+      : NativeModules.I18nManager.localeIdentifier;
+
   return (
     <SafeAreaView style={styles.container}>
       {/* 顶部Logo和欢迎信息 */}
       <View style={styles.topSection}>
         <Image source={require('../assets/logos/1x/logo.png')} style={styles.logo} />
         <Text style={styles.title}>semo</Text>
-        <Text style={styles.subtitle}>version: {version} (build: {buildNumber})</Text>
+        <Text style={styles.subtitle}>
+          version: {version} (build: {buildNumber}) - Lang: {deviceLanguage}
+        </Text>
       </View>
 
       {/* 固定高度的测试信息 */}
