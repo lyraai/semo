@@ -8,6 +8,7 @@ import { checkBackendConnection, sendQuestionnaireData } from '../service/api';
 import { colors } from '../styles/color';
 import { updateAnswer } from '../redux/slices/questionnaireSlice'; // 引入 updateAnswer
 import ProgressBar from '../components/ProgressBar'; // 引入进度条组件
+import { t, languageCode } from '../locales/localization';
 
 type FinalScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'FinalScreen'>;
 
@@ -42,7 +43,7 @@ export default function QuestionFinalScreen({ navigation }: Props) {
 
   const handleStartChat = async () => {
     if (!userId) {
-      Alert.alert('错误', '无法找到用户ID');
+      Alert.alert(t('error'), t('user_id_not_found'));
       return;
     }
 
@@ -51,7 +52,7 @@ export default function QuestionFinalScreen({ navigation }: Props) {
       await checkBackendConnection();  // 检查后端连接
 
       // 设置疗愈师风格为默认值，例如 '温暖' 或 '默认'
-      const defaultTherapistStyle = '默认';
+      const defaultTherapistStyle = t('default_therapist_style');
       dispatch(updateAnswer({ question: 'therapist_style', answer: defaultTherapistStyle }));
 
       // 将更新后的问卷数据发送到后端
@@ -61,19 +62,19 @@ export default function QuestionFinalScreen({ navigation }: Props) {
       });
 
       // 打印服务器返回的消息
-      console.log('Questionnaire data sent successfully:', response);
+      console.log(t('questionnaire_data_sent_successfully'), response);
 
       if (response && response.message) {
-        console.log('Server Response:', response.message);
+        console.log(t('server_response'), response.message);
       } else {
-        console.log('No response message from server.');
+        console.log(t('no_response_message'));
       }
 
       // 导航到主界面
       navigation.navigate('Home');
     } catch (error) {
-      console.error('初始化失败:', error);
-      Alert.alert('错误', '初始化失败，请稍后重试');
+      console.error(t('initialization_failed'), error);
+      Alert.alert(t('error'), t('initialization_failed_try_again'));
     } finally {
       setIsLoading(false);
     }
@@ -89,26 +90,26 @@ export default function QuestionFinalScreen({ navigation }: Props) {
       <ScrollView contentContainerStyle={styles.contentContainer}>
         {/* 感谢您的回答 Container */}
         <Animated.View style={[styles.summaryContainer, { opacity: animations[0] }]}>
-          <Text style={styles.summaryText}>感谢您完成问卷！</Text>
+          <Text style={styles.summaryText}>{t('thank_you_for_completing')}</Text>
         </Animated.View>
 
         {/* 问题和答案 Container */}
         <Animated.View style={[styles.answersContainer, { opacity: animations[1] }]}>
-          <Text style={styles.answersHeader}>您选择的答案：</Text>
+          <Text style={styles.answersHeader}>{t('your_selected_answers')}</Text>
           <View style={styles.qaContainer}>
-            <Text style={styles.questionText}>关系状态: </Text>
+            <Text style={styles.questionText}>{t('relationship_status')}: </Text>
             <Text style={styles.answerText}>{questionnaireData.current_state}</Text>
           </View>
           <View style={styles.qaContainer}>
-            <Text style={styles.questionText}>分开时长: </Text>
+            <Text style={styles.questionText}>{t('separation_duration')}: </Text>
             <Text style={styles.answerText}>{questionnaireData.duration}</Text>
           </View>
           <View style={styles.qaContainer}>
-            <Text style={styles.questionText}>当前感受: </Text>
+            <Text style={styles.questionText}>{t('current_feeling')}: </Text>
             <Text style={styles.answerText}>{questionnaireData.current_feeling}</Text>
           </View>
           <View style={styles.qaContainer}>
-            <Text style={styles.questionText}>想要的结果: </Text>
+            <Text style={styles.questionText}>{t('desired_outcome')}: </Text>
             <Text style={styles.answerText}>{questionnaireData.expectation}</Text>
           </View>
         </Animated.View>
@@ -122,7 +123,7 @@ export default function QuestionFinalScreen({ navigation }: Props) {
           disabled={isLoading}  // 禁用按钮防止重复点击
         >
           <Text style={[styles.nextButtonText, isLoading && styles.disabledNextButtonText]}>
-            {isLoading ? '加载中...' : '开始心理疗愈之旅'}
+            {isLoading ? t('loading') : t('start_healing_journey')}
           </Text>
         </TouchableOpacity>
       </View>
