@@ -8,6 +8,7 @@ import { updateUserId, loadUserIdFromStorage } from '../redux/slices/userSlice';
 import { colors } from '../styles/color';
 import Constants from 'expo-constants';
 import { RootState } from '../redux/store'; 
+import { translate, languageCode } from '../locales/localization';
 
 type WelcomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Welcome'>;
 
@@ -26,9 +27,9 @@ export default function WelcomeScreen({ navigation }: Props) {
     const checkConnection = async () => {
       try {
         const result = await checkBackendConnection();
-        setConnectionStatus(result.message || '连接成功');
+        setConnectionStatus(result.message || translate('connectionSuccess'));
       } catch (error) {
-        setConnectionStatus('无法连接到服务器，已切换到模拟模式');
+        setConnectionStatus(translate('connectionError'));
       }
     };
     checkConnection();
@@ -52,17 +53,11 @@ export default function WelcomeScreen({ navigation }: Props) {
     ).start();
   }, [textOpacity]);
 
-  const version = Constants.expoConfig?.version || '未知';
+  const version = Constants.expoConfig?.version || translate('unknown');
   const buildNumber = Platform.select({
     ios: Constants.expoConfig?.ios?.buildNumber,
     android: Constants.expoConfig?.android?.versionCode?.toString(),
-  }) || '未知';
-
-  // 获取设备语言并转换为缩写
-  const deviceLanguage =
-    Platform.OS === 'ios'
-      ? NativeModules.SettingsManager.settings.AppleLocale
-      : NativeModules.I18nManager.localeIdentifier;
+  }) || translate('unknown');
 
   return (
     <SafeAreaView style={styles.container}>
@@ -71,7 +66,7 @@ export default function WelcomeScreen({ navigation }: Props) {
         <Image source={require('../assets/logos/1x/logo.png')} style={styles.logo} />
         <Text style={styles.title}>semo</Text>
         <Text style={styles.subtitle}>
-          version: {version} (build: {buildNumber}) - Lang: {deviceLanguage}
+          version: {version} (build: {buildNumber}) - {translate('lang')}: {languageCode}
         </Text>
       </View>
 
@@ -83,7 +78,7 @@ export default function WelcomeScreen({ navigation }: Props) {
         {userId ? (
           <Text style={styles.userIdText}>ID: {userId}</Text>
         ) : (
-          <Button title="生成用户ID" onPress={generateUserId} color="#4CAF50" />
+          <Button title={translate('generate_user_id')} onPress={generateUserId} color="#4CAF50" />
         )}
       </View>
 
@@ -91,14 +86,14 @@ export default function WelcomeScreen({ navigation }: Props) {
       <View style={styles.signupSection}>
         <TouchableOpacity onPress={() => navigation.navigate('Question0')}>
           <Animated.Text style={[styles.signupText, { opacity: textOpacity }]}>
-            注册
+            {translate('signup')}
           </Animated.Text>
         </TouchableOpacity>
       </View>
       <View style={styles.loginSection}>
         <TouchableOpacity onPress={() => navigation.navigate('Home')}>
           <Animated.Text style={[styles.loginText, { opacity: textOpacity }]}>
-            登录
+            {translate('login')}
           </Animated.Text>
         </TouchableOpacity>
       </View>
