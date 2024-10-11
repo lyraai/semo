@@ -8,7 +8,7 @@ import { updateUserId, loadUserIdFromStorage } from '../redux/slices/userSlice';
 import { colors } from '../styles/color';
 import Constants from 'expo-constants';
 import { RootState } from '../redux/store'; 
-import { translate, languageCode } from '../locales/localization';
+import { t, languageCode } from '../locales/localization';
 
 type WelcomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Welcome'>;
 
@@ -27,9 +27,9 @@ export default function WelcomeScreen({ navigation }: Props) {
     const checkConnection = async () => {
       try {
         const result = await checkBackendConnection();
-        setConnectionStatus(result.message || translate('connectionSuccess'));
+        setConnectionStatus(result.message || t('connectionSuccess'));
       } catch (error) {
-        setConnectionStatus(translate('connectionError'));
+        setConnectionStatus(t('connectionError'));
       }
     };
     checkConnection();
@@ -53,11 +53,11 @@ export default function WelcomeScreen({ navigation }: Props) {
     ).start();
   }, [textOpacity]);
 
-  const version = Constants.expoConfig?.version || translate('unknown');
+  const version = Constants.expoConfig?.version || t('unknown');
   const buildNumber = Platform.select({
     ios: Constants.expoConfig?.ios?.buildNumber,
     android: Constants.expoConfig?.android?.versionCode?.toString(),
-  }) || translate('unknown');
+  }) || t('unknown');
 
   return (
     <SafeAreaView style={styles.container}>
@@ -66,7 +66,7 @@ export default function WelcomeScreen({ navigation }: Props) {
         <Image source={require('../assets/logos/1x/logo.png')} style={styles.logo} />
         <Text style={styles.title}>semo</Text>
         <Text style={styles.subtitle}>
-          version: {version} (build: {buildNumber}) - {translate('lang')}: {languageCode}
+          version: {version} (build: {buildNumber}) - {t('lang')}: {languageCode}
         </Text>
       </View>
 
@@ -78,7 +78,7 @@ export default function WelcomeScreen({ navigation }: Props) {
         {userId ? (
           <Text style={styles.userIdText}>ID: {userId}</Text>
         ) : (
-          <Button title={translate('generate_user_id')} onPress={generateUserId} color="#4CAF50" />
+          <Button title={t('generate_user_id')} onPress={generateUserId} color="#4CAF50" />
         )}
       </View>
 
@@ -86,14 +86,14 @@ export default function WelcomeScreen({ navigation }: Props) {
       <View style={styles.signupSection}>
         <TouchableOpacity onPress={() => navigation.navigate('Question0')}>
           <Animated.Text style={[styles.signupText, { opacity: textOpacity }]}>
-            {translate('signup')}
+            {t('signup')}
           </Animated.Text>
         </TouchableOpacity>
       </View>
       <View style={styles.loginSection}>
         <TouchableOpacity onPress={() => navigation.navigate('Home')}>
           <Animated.Text style={[styles.loginText, { opacity: textOpacity }]}>
-            {translate('login')}
+            {t('login')}
           </Animated.Text>
         </TouchableOpacity>
       </View>
