@@ -72,16 +72,17 @@ export default function TherapistSettingScreen() {
   // 定义疗愈师风格的数据，包括图标
   const therapistStyles = stylesList.map((item) => ({
     key: item.id,
+    code: item.code,
     title: item.name,
     description: item.desc,
-    icon: getIconByStyleId(item.id), // 根据风格ID获取对应的图标
+    icon: getIconByStyleId(item.code), // 根据风格code获取对应的图标
   }));
 
   // 选择疗愈师风格并更新问卷数据
-  const handleStyleSelect = (styleId: string) => {
-    setSelectedStyle(styleId);
-    dispatch(updateAnswer({ question: 'therapist_style', answer: styleId }));
-    console.log(`选择的疗愈师风格ID: ${styleId}`);
+  const handleStyleSelect = (styleCode: string) => {
+    setSelectedStyle(styleCode);
+    dispatch(updateAnswer({ question: 'therapist_style', answer: styleCode }));
+    console.log(`选择的疗愈师风格CODE: ${styleCode}`);
   };
 
   // 确认选择并开始聊天
@@ -131,30 +132,30 @@ export default function TherapistSettingScreen() {
       <View style={styles.contentContainer}>
         <FlatList
           data={therapistStyles}
-          keyExtractor={(item) => item.key}
+          keyExtractor={(item) => item.code}
           numColumns={2}
           columnWrapperStyle={styles.cardsContainer}
           renderItem={({ item }) => (
             <TouchableOpacity
-              key={item.key}
+              key={item.code}
               style={[
                 styles.card,
-                selectedStyle === item.key && styles.selectedCard,
+                selectedStyle === item.code && styles.selectedCard,
               ]}
-              onPress={() => handleStyleSelect(item.key)}
+              onPress={() => handleStyleSelect(item.code)}
               activeOpacity={0.8}
             >
               <Image
                 source={item.icon}
                 style={[
                   styles.cardIcon,
-                  selectedStyle === item.key && styles.selectedIcon,
+                  selectedStyle === item.code && styles.selectedIcon,
                 ]}
               />
               <Text
                 style={[
                   styles.cardTitle,
-                  selectedStyle === item.key && styles.selectedCardTitle,
+                  selectedStyle === item.code && styles.selectedCardTitle,
                 ]}
               >
                 {item.title}
@@ -162,7 +163,7 @@ export default function TherapistSettingScreen() {
               <Text
                 style={[
                   styles.cardDescription,
-                  selectedStyle === item.key && styles.selectedCardDescription,
+                  selectedStyle === item.code && styles.selectedCardDescription,
                 ]}
               >
                 {item.description}

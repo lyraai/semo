@@ -53,6 +53,17 @@ export default function WelcomeScreen({ navigation }: Props) {
     ).start();
   }, [textOpacity]);
 
+  const handleSignup = async () => {
+    try {
+      const newUserId = await generateUserId();
+      dispatch(updateUserId(newUserId));
+      navigation.navigate('Question0');
+    } catch (error) {
+      console.error('Failed to generate user ID:', error);
+      Alert.alert('Error', 'Failed to generate user ID. Please try again.');
+    }
+  };
+
   const version = Constants.expoConfig?.version || t('unknown');
   const buildNumber = Platform.select({
     ios: Constants.expoConfig?.ios?.buildNumber,
@@ -84,7 +95,7 @@ export default function WelcomeScreen({ navigation }: Props) {
 
       {/* 底部固定按钮 */}
       <View style={styles.signupSection}>
-        <TouchableOpacity onPress={() => navigation.navigate('Question0')}>
+        <TouchableOpacity onPress={handleSignup}>
           <Animated.Text style={[styles.signupText, { opacity: textOpacity }]}>
             {t('signup')}
           </Animated.Text>
