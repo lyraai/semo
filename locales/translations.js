@@ -76,7 +76,38 @@ export default {
         "warm_description": "Empathetic and supportive approach", // #73
         "rational_description": "Logical and analytical approach", // #74
         "vibrant_description": "Energetic and motivational approach", // #75
-        "spiritual_description": "Holistic and mindful approach" // #76
+        "spiritual_description": "Holistic and mindful approach", // #76
+        "please_select_gender": "Please select your gender", // #77
+        "gender_male": "Male", // #78
+        "gender_female": "Female", // #79
+        "gender_other": "Other", // #80
+        "please_select_age": "Please select your age", // #81
+        "continue_answer": "Continue", // #82
+        "current_relationship_status": "Current relationship status is...", // #83
+        "relationship_status_completely_disconnected": "Completely disconnected", // #84
+        "relationship_status_occasional_contact": "Occasional contact", // #85
+        "relationship_status_on_and_off": "On and off", // #86
+        "relationship_status_partner_in_new_relationship": "Partner is in a new relationship", // #87
+        "relationship_status_i_am_in_new_relationship": "I am in a new relationship", // #88
+        "how_long_since_separation": "How long has it been since the separation?", // #89
+        "separation_duration_within_one_week": "Within one week", // #90
+        "separation_duration_one_to_four_weeks": "1-4 weeks", // #91
+        "separation_duration_one_to_three_months": "1-3 months", // #92
+        "separation_duration_more_than_three_months": "More than 3 months", // #93
+        "your_current_feeling": "Your current feeling is...", // #94
+        "feeling_missing": "Missing", // #95
+        "feeling_lonely": "Lonely", // #96
+        "feeling_confused": "Confused", // #97
+        "feeling_guilty": "Guilty", // #98
+        "feeling_heartbroken": "Heartbroken", // #99
+        "feeling_angry": "Angry", // #100
+        "feeling_hopeful": "Hopeful", // #101
+        "feeling_relieved": "Relieved", // #102
+        "what_you_want_most": "What you want most now is...", // #103
+        "expectation_relieve_emotions": "Relieve emotions", // #104
+        "expectation_reconcile": "Reconcile", // #105
+        "expectation_let_go_completely": "Let go completely", // #106
+        "expectation_start_new_relationship": "Start a new relationship" // #107
     },
     zh: {
         "generate_user_id": "生成用户ID", // #1
@@ -155,7 +186,38 @@ export default {
         "warm_description": "富有同理心和支持性的方法", // #73
         "rational_description": "逻辑和分析性的方法", // #74
         "vibrant_description": "充满活力和激励性的方法", // #75
-        "spiritual_description": "整体和正念的方法" // #76
+        "spiritual_description": "整体和正念的方法", // #76
+        "please_select_gender": "请选择您的性别", // #77
+        "gender_male": "男性", // #78
+        "gender_female": "女性", // #79
+        "gender_other": "其他", // #80
+        "please_select_age": "请选择您的年龄", // #81
+        "continue_answer": "继续回答", // #82
+        "current_relationship_status": "现在的关系状态是...", // #83
+        "relationship_status_completely_disconnected": "完全断联", // #84
+        "relationship_status_occasional_contact": "偶尔联系", // #85
+        "relationship_status_on_and_off": "复复分合", // #86
+        "relationship_status_partner_in_new_relationship": "对方已有新恋情", // #87
+        "relationship_status_i_am_in_new_relationship": "我已有新恋情", // #88
+        "how_long_since_separation": "分开多久了？", // #89
+        "separation_duration_within_one_week": "一周内", // #90
+        "separation_duration_one_to_four_weeks": "1-4周", // #91
+        "separation_duration_one_to_three_months": "1-3个月", // #92
+        "separation_duration_more_than_three_months": "3个月以上", // #93
+        "your_current_feeling": "您现在的感受是...", // #94
+        "feeling_missing": "思念", // #95
+        "feeling_lonely": "孤独", // #96
+        "feeling_confused": "迷茫", // #97
+        "feeling_guilty": "内疚", // #98
+        "feeling_heartbroken": "心痛", // #99
+        "feeling_angry": "愤怒", // #100
+        "feeling_hopeful": "希望", // #101
+        "feeling_relieved": "解脱", // #102
+        "what_you_want_most": "您现在最想要的是...", // #103
+        "expectation_relieve_emotions": "缓解情绪", // #104
+        "expectation_reconcile": "复合", // #105
+        "expectation_let_go_completely": "彻底放下", // #106
+        "expectation_start_new_relationship": "开始新恋情" // #107
     }, 
     ja: {
         "generate_user_id": "ユーザーID生成", // #1
@@ -234,6 +296,37 @@ export default {
         "warm_description": "共感的でサポーティブなアプローチ", // #73
         "rational_description": "論理的で分析的なアプローチ", // #74
         "vibrant_description": "エネルギッシュでモチベーショナルなアプローチ", // #75
-        "spiritual_description": "全体的でマインドフルなアプローチ" // #76
+        "spiritual_description": "全体的でマインドフルなアプローチ", // #76
+        "please_select_gender": "性別を選択してください", // #77
+        "gender_male": "男性", // #78
+        "gender_female": "女性", // #79
+        "gender_other": "その他", // #80
+        "please_select_age": "年齢を選択してください", // #81
+        "continue_answer": "続ける", // #82
+        "current_relationship_status": "現在の関係状態は...", // #83
+        "relationship_status_completely_disconnected": "完全に断絶", // #84
+        "relationship_status_occasional_contact": "時々連絡がある", // #85
+        "relationship_status_on_and_off": "行ったり来たり", // #86
+        "relationship_status_partner_in_new_relationship": "相手に新しい恋人がいる", // #87
+        "relationship_status_i_am_in_new_relationship": "私に新しい恋人がいる", // #88
+        "how_long_since_separation": "別れてからどのくらい経ちましたか？", // #89
+        "separation_duration_within_one_week": "1週間以内", // #90
+        "separation_duration_one_to_four_weeks": "1-4週間", // #91
+        "separation_duration_one_to_three_months": "1-3ヶ月", // #92
+        "separation_duration_more_than_three_months": "3ヶ月以上", // #93
+        "your_current_feeling": "現在の気持ちは...", // #94
+        "feeling_missing": "恋しい", // #95
+        "feeling_lonely": "寂しい", // #96
+        "feeling_confused": "混乱している", // #97
+        "feeling_guilty": "罪悪感", // #98
+        "feeling_heartbroken": "心が痛む", // #99
+        "feeling_angry": "怒り", // #100
+        "feeling_hopeful": "希望的", // #101
+        "feeling_relieved": "安堵", // #102
+        "what_you_want_most": "今最も望んでいることは...", // #103
+        "expectation_relieve_emotions": "感情を和らげる", // #104
+        "expectation_reconcile": "復縁", // #105
+        "expectation_let_go_completely": "完全に手放す", // #106
+        "expectation_start_new_relationship": "新しい恋愛を始める" // #107
     }
 };

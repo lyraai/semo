@@ -6,7 +6,8 @@ import { updateAnswer } from '../redux/slices/questionnaireSlice';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../App';
 import { colors } from '../styles/color';
-import ProgressBar from '../components/ProgressBar'; // 引入进度条组件
+import ProgressBar from '../components/ProgressBar';
+import { t, languageCode } from '../locales/localization';
 
 type Question4ScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Question4'>;
 
@@ -54,12 +55,12 @@ export default function Question4Screen({ navigation }: Props) {
       </View>
       {/* Content */}
       <View style={styles.contentContainer}>
-        <Text style={styles.label}>您现在最想要的是...</Text>
+        <Text style={styles.label}>{t('what_you_want_most')}</Text>
         <View style={styles.optionsContainer}>
-          {renderButton('缓解情绪', '缓解情绪')}
-          {renderButton('复合', '复合')}
-          {renderButton('彻底放下', '彻底放下')}
-          {renderButton('开始新恋情', '开始新恋情')}
+          {renderButton(t('expectation_relieve_emotions'), t('expectation_relieve_emotions'))}
+          {renderButton(t('expectation_reconcile'), t('expectation_reconcile'))}
+          {renderButton(t('expectation_let_go_completely'), t('expectation_let_go_completely'))}
+          {renderButton(t('expectation_start_new_relationship'), t('expectation_start_new_relationship'))}
         </View>
       </View>
 
@@ -77,7 +78,7 @@ export default function Question4Screen({ navigation }: Props) {
             styles.nextButtonText,
             !selectedAnswer && styles.disabledNextButtonText,
           ]}>
-            继续回答
+            {t('continue_answer')}
           </Text>
         </TouchableOpacity>
       </View>

@@ -6,7 +6,8 @@ import { updateAnswer } from '../redux/slices/questionnaireSlice';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../App';
 import { colors } from '../styles/color';
-import ProgressBar from '../components/ProgressBar'; // 引入进度条组件
+import ProgressBar from '../components/ProgressBar';
+import { t, languageCode } from '../locales/localization';
 
 type Question2ScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Question2'>;
 
@@ -55,12 +56,12 @@ export default function Question2Screen({ navigation }: Props) {
 
       {/* Content */}
       <View style={styles.contentContainer}>
-        <Text style={styles.label}>分开多久了？</Text>
+        <Text style={styles.label}>{t('how_long_since_separation')}</Text>
         <View style={styles.optionsContainer}>
-          {renderButton('一周内', '一周内')}
-          {renderButton('1-4周', '1-4周')}
-          {renderButton('1-3个月', '1-3个月')}
-          {renderButton('3个月以上', '3个月以上')}
+          {renderButton(t('separation_duration_within_one_week'), t('separation_duration_within_one_week'))}
+          {renderButton(t('separation_duration_one_to_four_weeks'), t('separation_duration_one_to_four_weeks'))}
+          {renderButton(t('separation_duration_one_to_three_months'), t('separation_duration_one_to_three_months'))}
+          {renderButton(t('separation_duration_more_than_three_months'), t('separation_duration_more_than_three_months'))}
         </View>
       </View>
 
@@ -78,7 +79,7 @@ export default function Question2Screen({ navigation }: Props) {
             styles.nextButtonText,
             !selectedAnswer && styles.disabledNextButtonText,
           ]}>
-            继续回答
+            {t('continue_answer')}
           </Text>
         </TouchableOpacity>
       </View>
