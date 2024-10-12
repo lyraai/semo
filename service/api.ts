@@ -4,8 +4,8 @@ import { QuestionnaireData } from '../redux/slices/questionnaireSlice';
 import { languageCode } from '../locales/localization';
 
 
-// const BASE_URL = 'https://flask-hello-world-295622083030.asia-northeast1.run.app'; 
-const BASE_URL = 'http://127.0.0.1:8081'; 
+const BASE_URL = 'https://flask-hello-world-295622083030.asia-northeast1.run.app'; 
+// const BASE_URL = 'http://127.0.0.1:8081'; 
 export let useMock = false; 
 
 // 创建一个自定义的 Axios 实例
