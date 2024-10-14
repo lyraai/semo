@@ -80,10 +80,12 @@ export default function ChatScreen() {
     }
   }, [route.params]);
 
-  // 滚动到末尾
-  useEffect(() => {
-    scrollViewRef.current?.scrollToEnd({ animated: true });
-  }, [messages]);
+  // 新增一个函数来处理滚动到底部
+  const scrollToBottom = () => {
+    setTimeout(() => {
+      scrollViewRef.current?.scrollToEnd({ animated: true });
+    }, 100);
+  };
 
   // 发送消息函数
   const sendMessage = async () => {
@@ -98,20 +100,24 @@ export default function ChatScreen() {
       setInputText('');
       setLoading(true);
 
+      scrollToBottom(); // 用户发送消息后立即滚动到底部
+
       try {
         const response = await getAIResponse(semoUserId, inputText, topicId);
-        setMessages([...newMessages, { sender: 'ai', text: response.content }]);
+        const updatedMessages = [...newMessages, { sender: 'ai', text: response.content }];
+        setMessages(updatedMessages);
         setEmotion(response.emotion);
         setPredictedOptions(response.predicted_options);
 
         if (response.topic_id !== undefined) {
           setTopicId(response.topic_id);
         }
+
+        scrollToBottom(); // AI 回复后再次滚动到底部
       } catch (error) {
         console.error('Failed to get AI response:', error);
       } finally {
         setLoading(false);
-        setTimeout(() => scrollViewRef.current?.scrollToEnd({ animated: true }), 100);
       }
     } else {
       console.error('Message not sent. Either input is empty or User ID is missing.');
@@ -141,6 +147,7 @@ export default function ChatScreen() {
       <ScrollView
         style={styles.messagesContainer}
         ref={scrollViewRef}
+        onContentSizeChange={scrollToBottom} // 添加这一行以确保内容变化时也会滚动
       >
         {messages.map((msg, index) => (
           <View
