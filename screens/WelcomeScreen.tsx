@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet, Button, Alert, Platform, TouchableOpacity, Animated, SafeAreaView, NativeModules } from 'react-native';
+import { View, Text, Image, StyleSheet, Button, Alert, Platform, TouchableOpacity, Animated, SafeAreaView, NativeModules, ActivityIndicator } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../App';
+import type { RootStackParamList } from '../types/navigation';
 import { checkBackendConnection, generateUserId } from '../service/api';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateUserId, loadUserIdFromStorage } from '../redux/slices/userSlice';
 import { colors } from '../styles/color';
 import Constants from 'expo-constants';
-import { RootState } from '../redux/store'; 
+import { RootState, AppDispatch } from '../redux/store'; 
 import { t, languageCode } from '../locales/localization';
 
 type WelcomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Welcome'>;
@@ -19,8 +19,9 @@ type Props = {
 export default function WelcomeScreen({ navigation }: Props) {
   const [connectionStatus, setConnectionStatus] = useState<string | null>(null);
   const [textOpacity] = useState(new Animated.Value(1));
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const userId = useSelector((state: RootState) => state.user.userId);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     dispatch(loadUserIdFromStorage());
@@ -54,6 +55,8 @@ export default function WelcomeScreen({ navigation }: Props) {
   }, [textOpacity]);
 
   const handleSignup = async () => {
+    if (isLoading) return; // 如果正在加载，直接返回
+    setIsLoading(true);
     try {
       const newUserId = await generateUserId();
       dispatch(updateUserId(newUserId));
@@ -61,6 +64,8 @@ export default function WelcomeScreen({ navigation }: Props) {
     } catch (error) {
       console.error('Failed to generate user ID:', error);
       Alert.alert('Error', 'Failed to generate user ID. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -95,10 +100,18 @@ export default function WelcomeScreen({ navigation }: Props) {
 
       {/* 底部固定按钮 */}
       <View style={styles.signupSection}>
-        <TouchableOpacity onPress={handleSignup}>
-          <Animated.Text style={[styles.signupText, { opacity: textOpacity }]}>
-            {t('signup')}
-          </Animated.Text>
+        <TouchableOpacity 
+          onPress={handleSignup} 
+          disabled={isLoading}
+          style={[styles.signupButton, isLoading && styles.disabledButton]}
+        >
+          {isLoading ? (
+            <ActivityIndicator color={colors.white} />
+          ) : (
+            <Animated.Text style={[styles.signupText, { opacity: textOpacity }]}>
+              {t('signup')}
+            </Animated.Text>
+          )}
         </TouchableOpacity>
       </View>
       <View style={styles.loginSection}>
@@ -186,5 +199,14 @@ const styles = StyleSheet.create({
     fontWeight: 'regular',
     color: colors.textGray600,
     marginTop: 10, // 和“开始”按钮之间保持间距
+  },
+  signupButton: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  disabledButton: {
+    opacity: 0.7,
   },
 });
