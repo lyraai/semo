@@ -11,10 +11,10 @@ import {
   StyleSheet,
   ScrollView,
   ActivityIndicator,
-  Keyboard,
   Platform,
   Image,
   KeyboardAvoidingView,
+  useWindowDimensions,
 } from 'react-native';
 import { getAIResponse } from '../service/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -42,6 +42,8 @@ export default function ChatScreen() {
   const dispatch = useDispatch();
 
   const semoUserId = useSelector((state: RootState) => state.user.userId);
+
+  const { height: screenHeight } = useWindowDimensions();
 
   // 获取用户 ID
   useEffect(() => {
@@ -134,11 +136,10 @@ export default function ChatScreen() {
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 85 : 85} // 增加了 85 的额外高度
     >
       <ScrollView
         style={styles.messagesContainer}
-        contentContainerStyle={styles.messagesContentContainer}
-        keyboardShouldPersistTaps="handled"
         ref={scrollViewRef}
       >
         {messages.map((msg, index) => (
@@ -156,50 +157,52 @@ export default function ChatScreen() {
         {loading && <ActivityIndicator size="large" color={colors.primary} style={styles.loadingIndicator} />}
       </ScrollView>
 
-      <View style={styles.optionsAndEmotionContainer}>
-        <View style={styles.optionsContainer}>
-          {predictedOptions.map((option, index) => (
-            <TouchableOpacity
-              key={index}
-              style={styles.optionButton}
-              onPress={() => handleOptionPress(option)}
-            >
-              <Text style={styles.optionButtonText}>{option}</Text>
-            </TouchableOpacity>
-          ))}
+      <View style={styles.bottomContainer}>
+        <View style={styles.optionsAndEmotionContainer}>
+          <View style={styles.optionsContainer}>
+            {predictedOptions.map((option, index) => (
+              <TouchableOpacity
+                key={index}
+                style={styles.optionButton}
+                onPress={() => handleOptionPress(option)}
+              >
+                <Text style={styles.optionButtonText}>{option}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+          <View style={styles.emotionIndicatorContainer}>
+            <View style={[styles.emotionIndicator, { backgroundColor: getEmotionColor(emotion) }]} />
+          </View>
         </View>
-        <View style={styles.emotionIndicatorContainer}>
-          <View style={[styles.emotionIndicator, { backgroundColor: getEmotionColor(emotion) }]} />
-        </View>
-      </View>
 
-      <View style={styles.footerContainer}>
-        <View style={styles.inputWrapper}>
-          <TouchableOpacity style={styles.plusButton}>
-            <Image source={require('../assets/icons/2x/plus.png')} style={styles.plusIcon} />
-          </TouchableOpacity>
-          <TextInput
-            style={styles.input}
-            value={inputText}
-            onChangeText={setInputText}
-            placeholder="你可以继续输入..."
-            multiline={true}
-            textAlignVertical="top"
-          />
-          <TouchableOpacity
-            style={styles.sendButton}
-            onPress={sendMessage}
-            activeOpacity={inputText.trim() ? 0.7 : 1}
-            disabled={!inputText.trim()}
-          >
-            <Image
-              source={require('../assets/icons/2x/Sending.png')}
-              style={[
-                styles.sendIcon,
-                { tintColor: inputText.trim() ? colors.primary : colors.gray300 },
-              ]}
+        <View style={styles.footerContainer}>
+          <View style={styles.inputWrapper}>
+            <TouchableOpacity style={styles.plusButton}>
+              <Image source={require('../assets/icons/2x/plus.png')} style={styles.plusIcon} />
+            </TouchableOpacity>
+            <TextInput
+              style={styles.input}
+              value={inputText}
+              onChangeText={setInputText}
+              placeholder="你可以继续输入..."
+              multiline={true}
+              textAlignVertical="top"
             />
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.sendButton}
+              onPress={sendMessage}
+              activeOpacity={inputText.trim() ? 0.7 : 1}
+              disabled={!inputText.trim()}
+            >
+              <Image
+                source={require('../assets/icons/2x/Sending.png')}
+                style={[
+                  styles.sendIcon,
+                  { tintColor: inputText.trim() ? colors.primary : colors.gray300 },
+                ]}
+              />
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     </KeyboardAvoidingView>
@@ -218,6 +221,9 @@ const styles = StyleSheet.create({
   messagesContentContainer: {
     paddingHorizontal: 20,
     paddingVertical: 15,
+  },
+  bottomContainer: {
+    backgroundColor: colors.background01,
   },
   optionsAndEmotionContainer: {
     flexDirection: 'row',
