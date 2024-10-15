@@ -47,7 +47,7 @@ export default function Question3Screen({ navigation }: Props) {
     dispatch(
       updateAnswer({
         question: 'current_feeling',
-        answer: `${emotion} (等级${level})`,
+        answer: `${emotion} (level${level})`,
       })
     );
   };
@@ -55,7 +55,7 @@ export default function Question3Screen({ navigation }: Props) {
   const handleReset = (emotion: string) => {
     setSelectedAnswers((prev) => ({ ...prev, [emotion]: 0 }));
     dispatch(
-      updateAnswer({ question: 'current_feeling', answer: `${emotion} (等级0)` })
+      updateAnswer({ question: 'current_feeling', answer: `${emotion} (level0)` })
     );
   };
 
