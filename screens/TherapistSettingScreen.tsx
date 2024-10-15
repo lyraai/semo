@@ -9,6 +9,7 @@ import { colors } from '../styles/color';
 import { updateAnswer } from '../redux/slices/questionnaireSlice';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { t, languageCode } from '../locales/localization';
+import { setSessionId } from '../redux/slices/sessionSlice';
 
 // 定义导航参数的类型
 type RootStackParamList = {
@@ -16,6 +17,7 @@ type RootStackParamList = {
     initialMessage: string;
     initialOptions: string[];
     initialTopicId: number;
+    initialSessionId: number;
   };
 };
 
@@ -106,11 +108,15 @@ export default function TherapistSettingScreen() {
       const chatData = await initialiseChat(semoUserId);
       console.log('初始化聊天成功:', chatData);
 
+      dispatch(setSessionId(chatData.session_id));
+      console.log('获得session_id:', chatData.session_id);
+
       // 导航到聊天界面，并传递初始消息和选项
       navigation.navigate('ChatScreen', {
         initialMessage: chatData.content,
         initialOptions: chatData.predicted_options,
         initialTopicId: chatData.topic_id,
+        initialSessionId: chatData.session_id,
       });
     } catch (error) {
       console.error('开始聊天失败:', error);

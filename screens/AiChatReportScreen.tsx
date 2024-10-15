@@ -1,12 +1,12 @@
 //screens/AiChatReportScreen.tsx
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, Image } from 'react-native';
-import { Icon } from 'react-native-elements';
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator, Image } from 'react-native';
 import { LineChart, Grid } from 'react-native-svg-charts';
 import { colors } from '../styles/color';
 import { getReport } from '../service/api'; 
 import { useSelector } from 'react-redux';
 import { RootState } from '../redux/store';
+
 
 interface ErrorBoundaryProps {
   children: React.ReactNode;
@@ -31,27 +31,30 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps> {
   }
 }
 
-export default function AiChatReportScreen({ route }) {
+export default function AiChatReportScreen() {
   const [reportData, setReportData] = useState<any>(null); // 于存储后端返回的数据
   const [loading, setLoading] = useState<boolean>(true);
-  const userId = useSelector((state: RootState) => state.user.userId);// 从 Redux 获取 userId
+  const userId = useSelector((state: RootState) => state.user.userId);
+  const sessionId = useSelector((state: RootState) => state.session.sessionId);
   console.log("current user id", userId); 
 
   useEffect(() => {
     const fetchReport = async () => {
-      try {
-        const report = await getReport(userId); // 调用API获取报告
-        console.log("Report data received from backend:", report); // Console 中显示后端返回的数据
-        setReportData(report);
-      } catch (error) {
-        console.error("Failed to fetch report:", error);
-      } finally {
-        setLoading(false);
+      if (userId && sessionId) {
+        try {
+          const report = await getReport(userId, sessionId); // 调用API获取报告
+          console.log("Report data received from backend:", report); // Console 中显示后端返回的数据
+          setReportData(report);
+        } catch (error) {
+          console.error("Failed to fetch report:", error);
+        } finally {
+          setLoading(false);
+        }
       }
     };
     
     fetchReport();
-  }, [userId]);
+  }, [userId, sessionId]);
 
   if (loading) {
     return (

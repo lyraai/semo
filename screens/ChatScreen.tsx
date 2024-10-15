@@ -2,7 +2,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../redux/store';
-import { updateUserId } from '../redux/slices/userSlice';
 import {
   View,
   TextInput,
@@ -27,12 +26,14 @@ type Params = {
   initialMessage: string;
   initialOptions: string[];
   initialTopicId: number;
+  initialSessionId: number;
 };
 
 export default function ChatScreen() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState<string>('');
   const [topicId, setTopicId] = useState<number | null>(null);
+  const [sessionId, setSessionId] = useState<number | null>(null);
   const [emotion, setEmotion] = useState<number | null>(null);
   const [predictedOptions, setPredictedOptions] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -45,27 +46,15 @@ export default function ChatScreen() {
 
   const { height: screenHeight } = useWindowDimensions();
 
-  // 获取用户 ID
   useEffect(() => {
-    const fetchUserId = async () => {
-      try {
-        const storedUserId = await AsyncStorage.getItem('semo_user_id');
-        if (storedUserId && storedUserId !== semoUserId) {
-          dispatch(updateUserId(storedUserId));
-        }
-      } catch (error) {
-        console.error('Failed to fetch user ID from AsyncStorage:', error);
-      }
-    };
-
     if (!semoUserId) {
-      fetchUserId();
+      console.error('No User ID available in Redux store');
     }
-  }, [semoUserId, dispatch]);
+  }, [semoUserId]);
 
   // 设置初始消息、选项和 topicId
   useEffect(() => {
-    const { initialMessage, initialOptions, initialTopicId } = route.params || {};
+    const { initialMessage, initialOptions, initialTopicId, initialSessionId } = route.params || {};
 
     if (initialMessage) {
       setMessages([{ sender: 'ai', text: initialMessage }]); // 添加AI初始消息
@@ -77,6 +66,10 @@ export default function ChatScreen() {
 
     if (initialTopicId !== undefined) {
       setTopicId(initialTopicId); // 设置 topic ID
+    }
+
+    if (initialSessionId) {
+      setSessionId(initialSessionId);
     }
   }, [route.params]);
 
@@ -103,7 +96,7 @@ export default function ChatScreen() {
       scrollToBottom(); // 用户发送消息后立即滚动到底部
 
       try {
-        const response = await getAIResponse(semoUserId, inputText, topicId);
+        const response = await getAIResponse(semoUserId, inputText, topicId, sessionId);
         const updatedMessages = [...newMessages, { sender: 'ai', text: response.content }];
         setMessages(updatedMessages);
         setEmotion(response.emotion);
@@ -113,14 +106,19 @@ export default function ChatScreen() {
           setTopicId(response.topic_id);
         }
 
-        scrollToBottom(); // AI 回复后再次滚动到底部
+        // 如果后端返回新的 sessionId，更新它
+        if (response.session_id) {
+          setSessionId(response.session_id);
+        }
+
+        scrollToBottom();
       } catch (error) {
         console.error('Failed to get AI response:', error);
       } finally {
         setLoading(false);
       }
     } else {
-      console.error('Message not sent. Either input is empty or User ID is missing.');
+      console.error('Message not sent. Either input is empty, User ID is missing, or Session ID is missing.');
     }
   };
 

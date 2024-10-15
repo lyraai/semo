@@ -1,7 +1,7 @@
 // Root.tsx
 import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { updateUserId } from './redux/slices/userSlice';
+import { setUserId, updateUserId } from './redux/slices/userSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { generateUserId, checkBackendConnection } from './service/api';
 import { NavigationContainer } from '@react-navigation/native';
@@ -36,7 +36,7 @@ export default function Root() {
           storedUserId = newUserId;
           await AsyncStorage.setItem('userId', newUserId);
         }
-        dispatch(updateUserId(storedUserId)); // 将 userId 存储到 Redux 中
+        dispatch(setUserId(storedUserId)); // 将 userId 存储到 Redux 中
       } catch (error) {
         console.error('Failed to initialize user ID:', error);
       }

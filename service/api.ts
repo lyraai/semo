@@ -195,6 +195,7 @@ export const getTherapistStyles = async (semoUserId: string) => {
  * {
  *   content: string,
  *   predicted_options: [string],
+ *   session_id: number,
  *   topic_id: number
  * }
  * ```
@@ -223,7 +224,8 @@ export const initialiseChat = async (semoUserId: string) => {
  *   ```
  *   {
  *     user_input: string,
- *     topic_id: number
+ *     topic_id: number,
+ *     session_id: number
  *   }
  *   ```
  * Receives:
@@ -235,7 +237,7 @@ export const initialiseChat = async (semoUserId: string) => {
  * }
  * ```
  */
-export const getAIResponse = async (semoUserId: string, message: string, topicId: number | null) => {
+export const getAIResponse = async (semoUserId: string, message: string, topicId: number | null, sessionId: number | null) => {
   if (useMock) {
     return mockGetAIResponse(message);
   }
@@ -243,7 +245,8 @@ export const getAIResponse = async (semoUserId: string, message: string, topicId
   try {
     const response = await api.post(`/api/semo/v1/user/${semoUserId}/chat`, {
       user_input: message,
-      topic_id: topicId 
+      topic_id: topicId,
+      session_id: sessionId
     });
     console.log("Response from backend:", response.data);
     return response.data; 
@@ -267,13 +270,13 @@ export const getAIResponse = async (semoUserId: string, message: string, topicId
  * }
  * ```
  */
-export const getReport = async (semoUserId: string) => {
+export const getReport = async (semoUserId: string, sessionId: number) => {
   if (useMock) {
     return mockGetReport();
   }
 
   try {
-    const response = await api.get(`/api/semo/v1/user/${semoUserId}/report`);
+    const response = await api.get(`/api/semo/v2/user/${semoUserId}/session/${sessionId}/report`);
     return response.data; 
   } catch (error) {
     console.error('Failed to get report:', error);
