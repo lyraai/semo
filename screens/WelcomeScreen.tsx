@@ -55,15 +55,15 @@ export default function WelcomeScreen({ navigation }: Props) {
   }, [textOpacity]);
 
   const handleSignup = async () => {
-    if (isLoading) return; // 如果正在加载，直接返回
+    if (isLoading) return;
     setIsLoading(true);
     try {
       const newUserId = await generateUserId();
-      dispatch(updateUserId(newUserId));
+      await dispatch(updateUserId(newUserId)).unwrap();
       navigation.navigate('Question0');
     } catch (error) {
-      console.error('Failed to generate user ID:', error);
-      Alert.alert('Error', 'Failed to generate user ID. Please try again.');
+      console.error('Failed to generate or update user ID:', error);
+      Alert.alert('Error', 'Failed to generate or update user ID. Please try again.');
     } finally {
       setIsLoading(false);
     }
