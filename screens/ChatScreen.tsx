@@ -265,7 +265,7 @@ const styles = StyleSheet.create({
   },
   optionButtonText: {
     color: colors.primary,
-    fontSize: 17,
+    fontSize: 15,
   },
   userMessageBubble: {
     backgroundColor: colors.primary,
