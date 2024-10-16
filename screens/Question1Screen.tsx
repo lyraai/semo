@@ -7,6 +7,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../App';
 import { colors } from '../styles/color';
 import ProgressBar from '../components/ProgressBar';
+import { t, languageCode } from '../locales/localization';
 
 type Question1ScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Question1'>;
 
@@ -54,13 +55,13 @@ export default function Question1Screen({ navigation }: Props) {
       </View>
       {/* Content */}
       <View style={styles.contentContainer}>
-        <Text style={styles.label}>现在的关系状态是...</Text>
+        <Text style={styles.label}>{t('current_relationship_status')}</Text>
         <View style={styles.optionsContainer}>
-          {renderButton('完全断联', '完全断联')}
-          {renderButton('偶尔联系', '偶尔联系')}
-          {renderButton('复复分合', '复复分合')}
-          {renderButton('对方已有新恋情', '对方已有新恋情')}
-          {renderButton('我已有新恋情', '我已有新恋情')}
+          {renderButton(t('relationship_status_completely_disconnected'), t('relationship_status_completely_disconnected'))}
+          {renderButton(t('relationship_status_occasional_contact'), t('relationship_status_occasional_contact'))}
+          {renderButton(t('relationship_status_on_and_off'), t('relationship_status_on_and_off'))}
+          {renderButton(t('relationship_status_partner_in_new_relationship'), t('relationship_status_partner_in_new_relationship'))}
+          {renderButton(t('relationship_status_i_am_in_new_relationship'), t('relationship_status_i_am_in_new_relationship'))}
         </View>
       </View>
 
@@ -69,16 +70,16 @@ export default function Question1Screen({ navigation }: Props) {
         <TouchableOpacity
           style={[
             styles.nextButton,
-            !selectedAnswer && styles.disabledNextButton // 未选中时的样式
+            !selectedAnswer && styles.disabledNextButton
           ]}
           onPress={handleNext}
           disabled={!selectedAnswer}
         >
           <Text style={[
             styles.nextButtonText,
-            !selectedAnswer && styles.disabledNextButtonText // 未激活时的文字样式
+            !selectedAnswer && styles.disabledNextButtonText
           ]}>
-            继续回答
+            {t('continue_answer')}
           </Text>
         </TouchableOpacity>
       </View>

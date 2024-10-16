@@ -7,6 +7,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../App';
 import { colors } from '../styles/color';
 import ProgressBar from '../components/ProgressBar';
+import { t, languageCode } from '../locales/localization';
 
 type Question3ScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -46,7 +47,7 @@ export default function Question3Screen({ navigation }: Props) {
     dispatch(
       updateAnswer({
         question: 'current_feeling',
-        answer: `${emotion} (等级${level})`,
+        answer: `${emotion} (level${level})`,
       })
     );
   };
@@ -54,7 +55,7 @@ export default function Question3Screen({ navigation }: Props) {
   const handleReset = (emotion: string) => {
     setSelectedAnswers((prev) => ({ ...prev, [emotion]: 0 }));
     dispatch(
-      updateAnswer({ question: 'current_feeling', answer: `${emotion} (等级0)` })
+      updateAnswer({ question: 'current_feeling', answer: `${emotion} (level0)` })
     );
   };
 
@@ -107,14 +108,14 @@ export default function Question3Screen({ navigation }: Props) {
 
   // 定义按钮的位置
   const buttonPositions = [
-    { title: '思念', top: 0, left: 25 },
-    { title: '孤独', top: 0, left: 155 },
-    { title: '迷茫', top: 100, left: 75 },
-    { title: '内疚', top: 100, left: 215 },
-    { title: '心痛', top: 200, left: 25 },
-    { title: '愤怒', top: 200, left: 155 },
-    { title: '希望', top: 300, left: 75 },
-    { title: '解脱', top: 300, left: 215 },
+    { title: t('feeling_missing'), top: 0, left: 25 },
+    { title: t('feeling_lonely'), top: 0, left: 155 },
+    { title: t('feeling_confused'), top: 100, left: 75 },
+    { title: t('feeling_guilty'), top: 100, left: 215 },
+    { title: t('feeling_heartbroken'), top: 200, left: 25 },
+    { title: t('feeling_angry'), top: 200, left: 155 },
+    { title: t('feeling_hopeful'), top: 300, left: 75 },
+    { title: t('feeling_relieved'), top: 300, left: 215 },
   ];
 
   return (
@@ -126,7 +127,7 @@ export default function Question3Screen({ navigation }: Props) {
 
       {/* Content */}
       <View style={styles.contentContainer}>
-        <Text style={styles.label}>您现在的感受是...</Text>
+        <Text style={styles.label}>{t('your_current_feeling')}</Text>
         <View style={styles.optionsContainer}>
           {buttonPositions.map((item) =>
             renderButton(item.title, { top: item.top, left: item.left })
@@ -137,7 +138,7 @@ export default function Question3Screen({ navigation }: Props) {
       {/* Bottom Button */}
       <View style={styles.bottomButtonContainer}>
         <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
-          <Text style={styles.nextButtonText}>继续回答</Text>
+          <Text style={styles.nextButtonText}>{t('continue_answer')}</Text>
         </TouchableOpacity>
       </View>
     </View>

@@ -7,6 +7,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../App';
 import { colors } from '../styles/color'; 
 import ProgressBar from '../components/ProgressBar';
+import { t, languageCode } from '../locales/localization';
 
 type Question0ScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Question0'>;
 
@@ -41,7 +42,7 @@ export default function Question0Screen({ navigation }: Props) {
         <ProgressBar currentStep={0} totalSteps={5} />
       </View>
       <View style={styles.contentContainer}>
-        <Text style={styles.label}>请选择您的性别</Text>
+        <Text style={styles.label}>{t('please_select_gender')}</Text>
         <View style={styles.genderContainer}>
           <TouchableOpacity onPress={() => handleGenderSelect('male')} style={styles.genderButton}>
             <Image
@@ -54,7 +55,7 @@ export default function Question0Screen({ navigation }: Props) {
             <Text style={[
               styles.genderLabel,
               gender === 'male' && styles.selectedGenderLabel
-            ]}>男性</Text>
+            ]}>{t('gender_male')}</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => handleGenderSelect('female')} style={styles.genderButton}>
             <Image
@@ -67,7 +68,7 @@ export default function Question0Screen({ navigation }: Props) {
             <Text style={[
               styles.genderLabel,
               gender === 'female' && styles.selectedGenderLabel
-            ]}>女性</Text> 
+            ]}>{t('gender_female')}</Text> 
           </TouchableOpacity>
           <TouchableOpacity onPress={() => handleGenderSelect('other')} style={styles.genderButton}>
             <Image
@@ -80,11 +81,11 @@ export default function Question0Screen({ navigation }: Props) {
             <Text style={[
               styles.genderLabel,
               gender === 'other' && styles.selectedGenderLabel
-            ]}>其他</Text> 
+            ]}>{t('gender_other')}</Text> 
           </TouchableOpacity>
         </View>
 
-        <Text style={styles.label}>请选择您的年龄</Text>
+        <Text style={styles.label}>{t('please_select_age')}</Text>
         <View style={styles.ageContainer}>
           <Picker
             selectedValue={age}
@@ -112,7 +113,7 @@ export default function Question0Screen({ navigation }: Props) {
             styles.nextButtonText,
             (!gender || !age) && styles.disabledNextButtonText
           ]}>
-            {isLoading ? '加载中...' : '继续回答'}
+            {isLoading ? t('loading') : t('continue_answer')}
           </Text>
         </TouchableOpacity>
       </View>

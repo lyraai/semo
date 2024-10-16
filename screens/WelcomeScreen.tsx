@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet, Button, Alert, Platform, TouchableOpacity, Animated, SafeAreaView } from 'react-native';
+import { View, Text, Image, StyleSheet, Button, Alert, Platform, TouchableOpacity, Animated, SafeAreaView, NativeModules, ActivityIndicator } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../App';
+import type { RootStackParamList } from '../types/navigation';
 import { checkBackendConnection, generateUserId } from '../service/api';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateUserId, loadUserIdFromStorage } from '../redux/slices/userSlice';
 import { colors } from '../styles/color';
 import Constants from 'expo-constants';
-import { RootState } from '../redux/store'; 
+import { RootState, AppDispatch } from '../redux/store'; 
+import { t, languageCode } from '../locales/localization';
 
 type WelcomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Welcome'>;
 
@@ -18,17 +19,18 @@ type Props = {
 export default function WelcomeScreen({ navigation }: Props) {
   const [connectionStatus, setConnectionStatus] = useState<string | null>(null);
   const [textOpacity] = useState(new Animated.Value(1));
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const userId = useSelector((state: RootState) => state.user.userId);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     dispatch(loadUserIdFromStorage());
     const checkConnection = async () => {
       try {
         const result = await checkBackendConnection();
-        setConnectionStatus(result.message || '连接成功');
+        setConnectionStatus(result.message || t('connectionSuccess'));
       } catch (error) {
-        setConnectionStatus('无法连接到服务器，已切换到模拟模式');
+        setConnectionStatus(t('connectionError'));
       }
     };
     checkConnection();
@@ -52,11 +54,26 @@ export default function WelcomeScreen({ navigation }: Props) {
     ).start();
   }, [textOpacity]);
 
-  const version = Constants.expoConfig?.version || '未知';
+  const handleSignup = async () => {
+    if (isLoading) return;
+    setIsLoading(true);
+    try {
+      const newUserId = await generateUserId();
+      await dispatch(updateUserId(newUserId)).unwrap();
+      navigation.navigate('Question0');
+    } catch (error) {
+      console.error('Failed to generate or update user ID:', error);
+      Alert.alert('Error', 'Failed to generate or update user ID. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const version = Constants.expoConfig?.version || t('unknown');
   const buildNumber = Platform.select({
     ios: Constants.expoConfig?.ios?.buildNumber,
     android: Constants.expoConfig?.android?.versionCode?.toString(),
-  }) || '未知';
+  }) || t('unknown');
 
   return (
     <SafeAreaView style={styles.container}>
@@ -64,7 +81,9 @@ export default function WelcomeScreen({ navigation }: Props) {
       <View style={styles.topSection}>
         <Image source={require('../assets/logos/1x/logo.png')} style={styles.logo} />
         <Text style={styles.title}>semo</Text>
-        <Text style={styles.subtitle}>version: {version} (build: {buildNumber})</Text>
+        <Text style={styles.subtitle}>
+          version: {version} (build: {buildNumber}) - {t('lang')}: {languageCode}
+        </Text>
       </View>
 
       {/* 固定高度的测试信息 */}
@@ -75,22 +94,30 @@ export default function WelcomeScreen({ navigation }: Props) {
         {userId ? (
           <Text style={styles.userIdText}>ID: {userId}</Text>
         ) : (
-          <Button title="生成用户ID" onPress={generateUserId} color="#4CAF50" />
+          <Button title={t('generate_user_id')} onPress={generateUserId} color="#4CAF50" />
         )}
       </View>
 
       {/* 底部固定按钮 */}
       <View style={styles.signupSection}>
-        <TouchableOpacity onPress={() => navigation.navigate('Question0')}>
-          <Animated.Text style={[styles.signupText, { opacity: textOpacity }]}>
-            注册
-          </Animated.Text>
+        <TouchableOpacity 
+          onPress={handleSignup} 
+          disabled={isLoading}
+          style={[styles.signupButton, isLoading && styles.disabledButton]}
+        >
+          {isLoading ? (
+            <ActivityIndicator color={colors.white} />
+          ) : (
+            <Animated.Text style={[styles.signupText, { opacity: textOpacity }]}>
+              {t('signup')}
+            </Animated.Text>
+          )}
         </TouchableOpacity>
       </View>
       <View style={styles.loginSection}>
         <TouchableOpacity onPress={() => navigation.navigate('Home')}>
           <Animated.Text style={[styles.loginText, { opacity: textOpacity }]}>
-            登录
+            {t('login')}
           </Animated.Text>
         </TouchableOpacity>
       </View>
@@ -172,5 +199,14 @@ const styles = StyleSheet.create({
     fontWeight: 'regular',
     color: colors.textGray600,
     marginTop: 10, // 和“开始”按钮之间保持间距
+  },
+  signupButton: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  disabledButton: {
+    opacity: 0.7,
   },
 });

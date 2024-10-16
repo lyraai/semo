@@ -20,15 +20,15 @@ export function TabNavigator() {
         tabBarIcon: ({ focused }) => {
           let iconSource;
 
-          if (route.name === '主页') {
+          if (route.name === t("home_screen")) {
             iconSource = require('../assets/icons/tab/Home.png');
-          } else if (route.name === '发现') {
+          } else if (route.name === t("discover_screen")) {
             iconSource = require('../assets/icons/tab/Search.png');
-          } else if (route.name === '疗愈') {
+          } else if (route.name === t("healing_screen")) {
             iconSource = require('../assets/icons/tab/Healingtool.png');
-          } else if (route.name === '记录') {
+          } else if (route.name === t("record_screen")) {
             iconSource = require('../assets/icons/tab/MoodJourney.png');
-          } else if (route.name === '用户') {
+          } else if (route.name === t("profile_screen")) {
             iconSource = require('../assets/icons/tab/Profile.png');
           }
 
@@ -67,11 +67,11 @@ export function TabNavigator() {
         },
       })}
     >
-      <Tab.Screen name="主页" component={HomeScreen} />
-      <Tab.Screen name="发现" component={DiscoverScreen} />
-      <Tab.Screen name="疗愈" component={ToolSelectionScreen} />
-      <Tab.Screen name="记录" component={MoodJourneyScreen} />
-      <Tab.Screen name="用户" component={ProfileScreen} />
+      <Tab.Screen name={t("home_screen")} component={HomeScreen} />
+      <Tab.Screen name={t("discover_screen")} component={DiscoverScreen} />
+      <Tab.Screen name={t("healing_screen")} component={ToolSelectionScreen} />
+      <Tab.Screen name={t("record_screen")} component={MoodJourneyScreen} />
+      <Tab.Screen name={t("profile_screen")} component={ProfileScreen} />
     </Tab.Navigator>
   );
 }

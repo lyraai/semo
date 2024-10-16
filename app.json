@@ -2,7 +2,7 @@
   "expo": {
     "name": "Semo",
     "slug": "semo",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -17,7 +17,12 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.semo.ai",
-      "buildNumber": "3"
+      "buildNumber": "7",
+      "config": {
+        "entitlements": {
+          "aps-environment": "development"
+        }
+      }
     },
     "android": {
       "adaptiveIcon": {

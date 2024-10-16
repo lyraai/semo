@@ -1,9 +1,23 @@
 // service/api.ts
-import axios from 'axios';
+import axios, { AxiosInstance } from 'axios';
 import { QuestionnaireData } from '../redux/slices/questionnaireSlice';
+import { languageCode } from '../locales/localization';
+
 
 const BASE_URL = 'https://flask-hello-world-295622083030.asia-northeast1.run.app'; 
+// const BASE_URL = 'http://127.0.0.1:8081'; 
 export let useMock = false; 
+
+// 创建一个自定义的 Axios 实例
+const api: AxiosInstance = axios.create({
+  baseURL: BASE_URL,
+});
+
+// 添加请求拦截器
+api.interceptors.request.use((config) => {
+  config.headers['Accept-Language'] = languageCode;
+  return config;
+});
 
 /**
  * Check backend connection
@@ -13,7 +27,7 @@ export let useMock = false;
  */
 export const checkBackendConnection = async () => {
   try {
-    const response = await axios.get(`${BASE_URL}/api/semo/v1/hello`);
+    const response = await api.get('/api/semo/v1/hello');
     console.log('Connected to backend');
     useMock = false;
     return response.data; // Expected format: { message: "Connected" }
@@ -36,7 +50,7 @@ export const generateUserId = async () => {
   }
 
   try {
-    const response = await axios.get(`${BASE_URL}/api/semo/v1/generate_user_id`);
+    const response = await api.get('/api/semo/v1/generate_user_id');
     return response.data.semo_user_id; // Expected format: { semo_user_id: "string" }
   } catch (error) {
     console.error('Failed to generate user ID:', error);
@@ -71,7 +85,7 @@ export const getBasicUserInfo = async (semoUserId: string) => {
   }
 
   try {
-    const response = await axios.get(`${BASE_URL}/api/semo/v1/user/${semoUserId}/basic_info`);
+    const response = await api.get(`/api/semo/v1/user/${semoUserId}/basic_info`);
     return response.data; // Expected format: { age, current_feeling, current_state, etc. }
   } catch (error) {
     console.error('Failed to retrieve basic user info:', error);
@@ -105,7 +119,7 @@ export const sendQuestionnaireData = async (semoUserId: string, data: Questionna
   }
 
   try {
-    const response = await axios.post(`${BASE_URL}/api/semo/v1/user/${semoUserId}/initialise`, data);
+    const response = await api.post(`/api/semo/v1/user/${semoUserId}/initialise`, data);
     return response.data; // Expected format: { message: "Data received successfully" }
   } catch (error) {
     console.error('Failed to send questionnaire data:', error);
@@ -128,7 +142,7 @@ export const updateTherapistStyle = async (semoUserId: string, therapistStyle: s
   }
 
   try {
-    const response = await axios.put(`${BASE_URL}/api/semo/v1/user/${semoUserId}/therapist_style`, {
+    const response = await api.put(`/api/semo/v1/user/${semoUserId}/therapist_style`, {
       therapist_style: therapistStyle
     });
     return response.data; // Expected format: { status: "success" }
@@ -163,7 +177,7 @@ export const getTherapistStyles = async (semoUserId: string) => {
   }
 
   try {
-    const response = await axios.get(`${BASE_URL}/api/semo/v1/user/${semoUserId}/therapist_styles`);
+    const response = await api.get(`/api/semo/v1/user/${semoUserId}/therapist_styles`);
     return response.data; 
   } catch (error) {
     console.error('Failed to get therapist styles:', error);
@@ -181,6 +195,7 @@ export const getTherapistStyles = async (semoUserId: string) => {
  * {
  *   content: string,
  *   predicted_options: [string],
+ *   session_id: number,
  *   topic_id: number
  * }
  * ```
@@ -191,7 +206,7 @@ export const initialiseChat = async (semoUserId: string) => {
   }
 
   try {
-    const response = await axios.get(`${BASE_URL}/api/semo/v1/user/${semoUserId}/chat/initialise`);
+    const response = await api.get(`/api/semo/v1/user/${semoUserId}/chat/initialise`);
     return response.data; 
   } catch (error) {
     console.error('Failed to initialise chat:', error);
@@ -209,7 +224,8 @@ export const initialiseChat = async (semoUserId: string) => {
  *   ```
  *   {
  *     user_input: string,
- *     topic_id: number
+ *     topic_id: number,
+ *     session_id: number
  *   }
  *   ```
  * Receives:
@@ -221,15 +237,16 @@ export const initialiseChat = async (semoUserId: string) => {
  * }
  * ```
  */
-export const getAIResponse = async (semoUserId: string, message: string, topicId: number | null) => {
+export const getAIResponse = async (semoUserId: string, message: string, topicId: number | null, sessionId: number | null) => {
   if (useMock) {
     return mockGetAIResponse(message);
   }
 
   try {
-    const response = await axios.post(`${BASE_URL}/api/semo/v1/user/${semoUserId}/chat`, {
+    const response = await api.post(`/api/semo/v1/user/${semoUserId}/chat`, {
       user_input: message,
-      topic_id: topicId 
+      topic_id: topicId,
+      session_id: sessionId
     });
     console.log("Response from backend:", response.data);
     return response.data; 
@@ -253,13 +270,13 @@ export const getAIResponse = async (semoUserId: string, message: string, topicId
  * }
  * ```
  */
-export const getReport = async (semoUserId: string) => {
+export const getReport = async (semoUserId: string, sessionId: number) => {
   if (useMock) {
     return mockGetReport();
   }
 
   try {
-    const response = await axios.get(`${BASE_URL}/api/semo/v1/user/${semoUserId}/report`);
+    const response = await api.get(`/api/semo/v2/user/${semoUserId}/session/${sessionId}/report`);
     return response.data; 
   } catch (error) {
     console.error('Failed to get report:', error);

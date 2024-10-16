@@ -8,6 +8,8 @@ import { useNavigation } from '@react-navigation/native';
 import { colors } from '../styles/color';
 import { updateAnswer } from '../redux/slices/questionnaireSlice';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { t, languageCode } from '../locales/localization';
+import { setSessionId } from '../redux/slices/sessionSlice';
 
 // 定义导航参数的类型
 type RootStackParamList = {
@@ -15,6 +17,7 @@ type RootStackParamList = {
     initialMessage: string;
     initialOptions: string[];
     initialTopicId: number;
+    initialSessionId: number;
   };
 };
 
@@ -31,7 +34,7 @@ export default function TherapistSettingScreen() {
   useEffect(() => {
     const fetchStyles = async () => {
       if (!semoUserId) {
-        Alert.alert('错误', '无法获取用户ID');
+        Alert.alert(t('error'), t('unable_to_get_user_id'));
         setLoading(false);
         return;
       }
@@ -43,7 +46,7 @@ export default function TherapistSettingScreen() {
         setSelectedStyle(data.current_style);
       } catch (error) {
         console.error('获取疗愈师风格失败:', error);
-        Alert.alert('错误', '无法获取疗愈师风格列表');
+        Alert.alert(t('error'), t('unable_to_get_therapist_style_list'));
       } finally {
         setLoading(false);
       }
@@ -71,27 +74,28 @@ export default function TherapistSettingScreen() {
   // 定义疗愈师风格的数据，包括图标
   const therapistStyles = stylesList.map((item) => ({
     key: item.id,
+    code: item.code,
     title: item.name,
     description: item.desc,
-    icon: getIconByStyleId(item.id), // 根据风格ID获取对应的图标
+    icon: getIconByStyleId(item.code), // 根据风格code获取对应的图标
   }));
 
   // 选择疗愈师风格并更新问卷数据
-  const handleStyleSelect = (styleId: string) => {
-    setSelectedStyle(styleId);
-    dispatch(updateAnswer({ question: 'therapist_style', answer: styleId }));
-    console.log(`选择的疗愈师风格ID: ${styleId}`);
+  const handleStyleSelect = (styleCode: string) => {
+    setSelectedStyle(styleCode);
+    dispatch(updateAnswer({ question: 'therapist_style', answer: styleCode }));
+    console.log(`选择的疗愈师风格CODE: ${styleCode}`);
   };
 
   // 确认选择并开始聊天
   const handleConfirm = async () => {
     if (!semoUserId) {
-      Alert.alert('错误', '无法获取用户ID');
+      Alert.alert(t('error'), t('unable_to_get_user_id'));
       return;
     }
 
     if (!selectedStyle) {
-      Alert.alert('提示', '请先选择一个疗愈师风格');
+      Alert.alert(t('prompt'), t('please_select_therapist_style'));
       return;
     }
 
@@ -104,15 +108,19 @@ export default function TherapistSettingScreen() {
       const chatData = await initialiseChat(semoUserId);
       console.log('初始化聊天成功:', chatData);
 
+      dispatch(setSessionId(chatData.session_id));
+      console.log('获得session_id:', chatData.session_id);
+
       // 导航到聊天界面，并传递初始消息和选项
       navigation.navigate('ChatScreen', {
         initialMessage: chatData.content,
         initialOptions: chatData.predicted_options,
         initialTopicId: chatData.topic_id,
+        initialSessionId: chatData.session_id,
       });
     } catch (error) {
       console.error('开始聊天失败:', error);
-      Alert.alert('错误', '无法开始聊天');
+      Alert.alert(t('error'), t('unable_to_start_chat'));
     }
   };
 
@@ -130,30 +138,30 @@ export default function TherapistSettingScreen() {
       <View style={styles.contentContainer}>
         <FlatList
           data={therapistStyles}
-          keyExtractor={(item) => item.key}
+          keyExtractor={(item) => item.code}
           numColumns={2}
           columnWrapperStyle={styles.cardsContainer}
           renderItem={({ item }) => (
             <TouchableOpacity
-              key={item.key}
+              key={item.code}
               style={[
                 styles.card,
-                selectedStyle === item.key && styles.selectedCard,
+                selectedStyle === item.code && styles.selectedCard,
               ]}
-              onPress={() => handleStyleSelect(item.key)}
+              onPress={() => handleStyleSelect(item.code)}
               activeOpacity={0.8}
             >
               <Image
                 source={item.icon}
                 style={[
                   styles.cardIcon,
-                  selectedStyle === item.key && styles.selectedIcon,
+                  selectedStyle === item.code && styles.selectedIcon,
                 ]}
               />
               <Text
                 style={[
                   styles.cardTitle,
-                  selectedStyle === item.key && styles.selectedCardTitle,
+                  selectedStyle === item.code && styles.selectedCardTitle,
                 ]}
               >
                 {item.title}
@@ -161,7 +169,7 @@ export default function TherapistSettingScreen() {
               <Text
                 style={[
                   styles.cardDescription,
-                  selectedStyle === item.key && styles.selectedCardDescription,
+                  selectedStyle === item.code && styles.selectedCardDescription,
                 ]}
               >
                 {item.description}
@@ -187,7 +195,7 @@ export default function TherapistSettingScreen() {
               !selectedStyle && styles.disabledButtonText,
             ]}
           >
-            开始对话
+            {t('start_conversation')}
           </Text>
         </TouchableOpacity>
       </View>

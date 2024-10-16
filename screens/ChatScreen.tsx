@@ -2,7 +2,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../redux/store';
-import { updateUserId } from '../redux/slices/userSlice';
 import {
   View,
   TextInput,
@@ -11,10 +10,10 @@ import {
   StyleSheet,
   ScrollView,
   ActivityIndicator,
-  Keyboard,
   Platform,
   Image,
   KeyboardAvoidingView,
+  useWindowDimensions,
 } from 'react-native';
 import { getAIResponse } from '../service/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -27,12 +26,14 @@ type Params = {
   initialMessage: string;
   initialOptions: string[];
   initialTopicId: number;
+  initialSessionId: number;
 };
 
 export default function ChatScreen() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState<string>('');
   const [topicId, setTopicId] = useState<number | null>(null);
+  const [sessionId, setSessionId] = useState<number | null>(null);
   const [emotion, setEmotion] = useState<number | null>(null);
   const [predictedOptions, setPredictedOptions] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -43,27 +44,17 @@ export default function ChatScreen() {
 
   const semoUserId = useSelector((state: RootState) => state.user.userId);
 
-  // 获取用户 ID
-  useEffect(() => {
-    const fetchUserId = async () => {
-      try {
-        const storedUserId = await AsyncStorage.getItem('semo_user_id');
-        if (storedUserId && storedUserId !== semoUserId) {
-          dispatch(updateUserId(storedUserId));
-        }
-      } catch (error) {
-        console.error('Failed to fetch user ID from AsyncStorage:', error);
-      }
-    };
+  const { height: screenHeight } = useWindowDimensions();
 
+  useEffect(() => {
     if (!semoUserId) {
-      fetchUserId();
+      console.error('No User ID available in Redux store');
     }
-  }, [semoUserId, dispatch]);
+  }, [semoUserId]);
 
   // 设置初始消息、选项和 topicId
   useEffect(() => {
-    const { initialMessage, initialOptions, initialTopicId } = route.params || {};
+    const { initialMessage, initialOptions, initialTopicId, initialSessionId } = route.params || {};
 
     if (initialMessage) {
       setMessages([{ sender: 'ai', text: initialMessage }]); // 添加AI初始消息
@@ -76,12 +67,18 @@ export default function ChatScreen() {
     if (initialTopicId !== undefined) {
       setTopicId(initialTopicId); // 设置 topic ID
     }
+
+    if (initialSessionId) {
+      setSessionId(initialSessionId);
+    }
   }, [route.params]);
 
-  // 滚动到末尾
-  useEffect(() => {
-    scrollViewRef.current?.scrollToEnd({ animated: true });
-  }, [messages]);
+  // 新增一个函数来处理滚动到底部
+  const scrollToBottom = () => {
+    setTimeout(() => {
+      scrollViewRef.current?.scrollToEnd({ animated: true });
+    }, 100);
+  };
 
   // 发送消息函数
   const sendMessage = async () => {
@@ -96,23 +93,32 @@ export default function ChatScreen() {
       setInputText('');
       setLoading(true);
 
+      scrollToBottom(); // 用户发送消息后立即滚动到底部
+
       try {
-        const response = await getAIResponse(semoUserId, inputText, topicId);
-        setMessages([...newMessages, { sender: 'ai', text: response.content }]);
+        const response = await getAIResponse(semoUserId, inputText, topicId, sessionId);
+        const updatedMessages = [...newMessages, { sender: 'ai', text: response.content }];
+        setMessages(updatedMessages);
         setEmotion(response.emotion);
         setPredictedOptions(response.predicted_options);
 
         if (response.topic_id !== undefined) {
           setTopicId(response.topic_id);
         }
+
+        // 如果后端返回新的 sessionId，更新它
+        if (response.session_id) {
+          setSessionId(response.session_id);
+        }
+
+        scrollToBottom();
       } catch (error) {
         console.error('Failed to get AI response:', error);
       } finally {
         setLoading(false);
-        setTimeout(() => scrollViewRef.current?.scrollToEnd({ animated: true }), 100);
       }
     } else {
-      console.error('Message not sent. Either input is empty or User ID is missing.');
+      console.error('Message not sent. Either input is empty, User ID is missing, or Session ID is missing.');
     }
   };
 
@@ -134,12 +140,12 @@ export default function ChatScreen() {
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 85 : 85} // 增加了 85 的额外高度
     >
       <ScrollView
         style={styles.messagesContainer}
-        contentContainerStyle={styles.messagesContentContainer}
-        keyboardShouldPersistTaps="handled"
         ref={scrollViewRef}
+        onContentSizeChange={scrollToBottom} // 添加这一行以确保内容变化时也会滚动
       >
         {messages.map((msg, index) => (
           <View
@@ -156,50 +162,52 @@ export default function ChatScreen() {
         {loading && <ActivityIndicator size="large" color={colors.primary} style={styles.loadingIndicator} />}
       </ScrollView>
 
-      <View style={styles.optionsAndEmotionContainer}>
-        <View style={styles.optionsContainer}>
-          {predictedOptions.map((option, index) => (
-            <TouchableOpacity
-              key={index}
-              style={styles.optionButton}
-              onPress={() => handleOptionPress(option)}
-            >
-              <Text style={styles.optionButtonText}>{option}</Text>
-            </TouchableOpacity>
-          ))}
+      <View style={styles.bottomContainer}>
+        <View style={styles.optionsAndEmotionContainer}>
+          <View style={styles.optionsContainer}>
+            {predictedOptions.map((option, index) => (
+              <TouchableOpacity
+                key={index}
+                style={styles.optionButton}
+                onPress={() => handleOptionPress(option)}
+              >
+                <Text style={styles.optionButtonText}>{option}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+          <View style={styles.emotionIndicatorContainer}>
+            <View style={[styles.emotionIndicator, { backgroundColor: getEmotionColor(emotion) }]} />
+          </View>
         </View>
-        <View style={styles.emotionIndicatorContainer}>
-          <View style={[styles.emotionIndicator, { backgroundColor: getEmotionColor(emotion) }]} />
-        </View>
-      </View>
 
-      <View style={styles.footerContainer}>
-        <View style={styles.inputWrapper}>
-          <TouchableOpacity style={styles.plusButton}>
-            <Image source={require('../assets/icons/2x/plus.png')} style={styles.plusIcon} />
-          </TouchableOpacity>
-          <TextInput
-            style={styles.input}
-            value={inputText}
-            onChangeText={setInputText}
-            placeholder="你可以继续输入..."
-            multiline={true}
-            textAlignVertical="top"
-          />
-          <TouchableOpacity
-            style={styles.sendButton}
-            onPress={sendMessage}
-            activeOpacity={inputText.trim() ? 0.7 : 1}
-            disabled={!inputText.trim()}
-          >
-            <Image
-              source={require('../assets/icons/2x/Sending.png')}
-              style={[
-                styles.sendIcon,
-                { tintColor: inputText.trim() ? colors.primary : colors.gray300 },
-              ]}
+        <View style={styles.footerContainer}>
+          <View style={styles.inputWrapper}>
+            <TouchableOpacity style={styles.plusButton}>
+              <Image source={require('../assets/icons/2x/plus.png')} style={styles.plusIcon} />
+            </TouchableOpacity>
+            <TextInput
+              style={styles.input}
+              value={inputText}
+              onChangeText={setInputText}
+              placeholder="你可以继续输入..."
+              multiline={true}
+              textAlignVertical="top"
             />
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.sendButton}
+              onPress={sendMessage}
+              activeOpacity={inputText.trim() ? 0.7 : 1}
+              disabled={!inputText.trim()}
+            >
+              <Image
+                source={require('../assets/icons/2x/Sending.png')}
+                style={[
+                  styles.sendIcon,
+                  { tintColor: inputText.trim() ? colors.primary : colors.gray300 },
+                ]}
+              />
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     </KeyboardAvoidingView>
@@ -218,6 +226,9 @@ const styles = StyleSheet.create({
   messagesContentContainer: {
     paddingHorizontal: 20,
     paddingVertical: 15,
+  },
+  bottomContainer: {
+    backgroundColor: colors.background01,
   },
   optionsAndEmotionContainer: {
     flexDirection: 'row',
@@ -254,7 +265,7 @@ const styles = StyleSheet.create({
   },
   optionButtonText: {
     color: colors.primary,
-    fontSize: 17,
+    fontSize: 15,
   },
   userMessageBubble: {
     backgroundColor: colors.primary,
