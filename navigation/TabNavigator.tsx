@@ -1,4 +1,4 @@
-// TabNavigator.tsx
+// navigation/TabNavigator.tsx
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Image } from 'react-native';
@@ -8,7 +8,7 @@ import ToolSelectionScreen from '../screens/ToolSelectionScreen';
 import MoodJourneyScreen from '../screens/features/MoodJourneyScreen';
 import ProfileScreen from '../screens/profile/ProfileScreen';
 import { colors } from '../styles/color';
-import HomeHeader from '../components/HomeHeader'; // Import HomeHeader
+import HomeHeader from '../components/HomeHeader'; 
 
 const Tab = createBottomTabNavigator();
 
