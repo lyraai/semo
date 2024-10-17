@@ -1,3 +1,4 @@
+// screens/WelcomeScreen.tsx
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, Button, Alert, Platform, TouchableOpacity, Animated, SafeAreaView, NativeModules, ActivityIndicator } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -98,28 +99,33 @@ export default function WelcomeScreen({ navigation }: Props) {
         )}
       </View>
 
-      {/* 底部固定按钮 */}
-      <View style={styles.signupSection}>
-        <TouchableOpacity 
-          onPress={handleSignup} 
-          disabled={isLoading}
-          style={[styles.signupButton, isLoading && styles.disabledButton]}
-        >
-          {isLoading ? (
-            <ActivityIndicator color={colors.white} />
-          ) : (
-            <Animated.Text style={[styles.signupText, { opacity: textOpacity }]}>
-              {t('signup')}
+      {/* 底部按钮容器 */}
+      <View style={styles.buttonContainer}>
+        {/* 注册按钮 */}
+        <View style={styles.signupSection}>
+          <TouchableOpacity 
+            onPress={handleSignup} 
+            disabled={isLoading}
+            style={[styles.signupButton, isLoading && styles.disabledButton]}
+          >
+            {isLoading ? (
+              <ActivityIndicator color={colors.white} />
+            ) : (
+              <Animated.Text style={[styles.signupText, { opacity: textOpacity }]}>
+                {t('signup')}
+              </Animated.Text>
+            )}
+          </TouchableOpacity>
+        </View>
+
+        {/* 登录按钮 */}
+        <View style={styles.loginSection}>
+          <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+            <Animated.Text style={[styles.loginText, { opacity: textOpacity }]}>
+              {t('login')}
             </Animated.Text>
-          )}
-        </TouchableOpacity>
-      </View>
-      <View style={styles.loginSection}>
-        <TouchableOpacity onPress={() => navigation.navigate('Home')}>
-          <Animated.Text style={[styles.loginText, { opacity: textOpacity }]}>
-            {t('login')}
-          </Animated.Text>
-        </TouchableOpacity>
+          </TouchableOpacity>
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -173,36 +179,40 @@ const styles = StyleSheet.create({
     marginBottom: 0,
     textAlign: 'left',
   },
+  buttonContainer: {
+    flex: 2, // 底部按钮容器占用的空间
+    justifyContent: 'space-between', // 让按钮之间有间距
+    alignItems: 'center',
+    paddingBottom: 30, // 为按钮容器添加一些底部间距
+    marginHorizontal: 10,
+  },
   signupSection: {
-    flex: 1, 
+    maxWidth: '50%',
     backgroundColor: colors.primary,
-    borderRadius:25,
+    borderRadius: 25,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 40, 
-    marginHorizontal: 120,
-  },
-  loginSection: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-    paddingBottom: 0,
-    marginBottom: 40,
+    paddingHorizontal: 40,
   },
   signupText: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
     color: colors.white,
+    textAlign: 'center',
+  },
+  loginSection: {
+    marginTop: 10, // 使登录按钮与注册按钮有一些间距
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   loginText: {
-    fontSize: 20,
-    fontWeight: 'regular',
+    fontSize: 18,
     color: colors.textGray600,
-    marginTop: 10, // 和“开始”按钮之间保持间距
+    textAlign: 'center',
   },
   signupButton: {
     width: '100%',
-    height: '100%',
+    height: 40, // 固定按钮高度
     justifyContent: 'center',
     alignItems: 'center',
   },

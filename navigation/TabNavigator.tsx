@@ -9,6 +9,7 @@ import MoodJourneyScreen from '../screens/features/MoodJourneyScreen';
 import ProfileScreen from '../screens/profile/ProfileScreen';
 import { colors } from '../styles/color';
 import HomeHeader from '../components/HomeHeader'; 
+import { t, languageCode } from '../locales/localization';
 
 const Tab = createBottomTabNavigator();
 

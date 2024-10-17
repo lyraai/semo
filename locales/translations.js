@@ -23,12 +23,12 @@ export default {
         "initialization_failed_try_again": "Initialization failed, please try again later", // #21
         "thank_you_for_completing": "Thank you for completing the questionnaire!", // #22
         "your_selected_answers": "Your selected answers:", // #23
-        "relationship_status": "Relationship status", // #24
-        "separation_duration": "Separation duration", // #25
+        "relationship_status": "Relationship", // #24
+        "separation_duration": "Separation", // #25
         "current_feeling": "Current feeling", // #26
         "desired_outcome": "Desired outcome", // #27
         "loading": "Loading...", // #28
-        "start_healing_journey": "Start Healing Journey", // #29
+        "start_healing_journey": "Start Journey", // #29
         "therapist_style": "Therapist Style", // #30
         "current_style": "Current Style", // #31
         "not_selected": "Not Selected", // #32
