@@ -14,13 +14,14 @@ import {
   Image,
   KeyboardAvoidingView,
   useWindowDimensions,
+  Animated,
 } from 'react-native';
 import { getAIResponse } from '../service/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { colors } from '../styles/color';
 
-type Message = { sender: 'user' | 'ai'; text: string };
+type Message = { sender: 'user' | 'ai'; text: string; delivered?: boolean; timestamp?: Date };
 
 type Params = {
   initialMessage: string;
@@ -28,6 +29,61 @@ type Params = {
   initialTopicId: number;
   initialSessionId: number;
 };
+
+const TypingIndicator = () => {
+  const animations = useRef([new Animated.Value(0), new Animated.Value(0), new Animated.Value(0)]).current;
+
+  useEffect(() => {
+    const sequence = Animated.sequence(
+      animations.map((animation) =>
+        Animated.sequence([
+          Animated.timing(animation, { toValue: 1, duration: 300, useNativeDriver: true }),
+          Animated.timing(animation, { toValue: 0, duration: 300, useNativeDriver: true }),
+        ])
+      )
+    );
+
+    Animated.loop(sequence).start();
+  }, []);
+
+  return (
+    <View style={styles.typingIndicator}>
+      {animations.map((animation, index) => (
+        <Animated.View
+          key={index}
+          style={[
+            styles.dot,
+            {
+              transform: [
+                {
+                  translateY: animation.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [0, -5],
+                  }),
+                },
+              ],
+            },
+          ]}
+        />
+      ))}
+    </View>
+  );
+};
+
+// 在文件顶部添加这个函数
+function getHumanLikeDelay(messageLength: number): number {
+  // 基础思考时间：0.5到2秒
+  const baseThinkingTime = Math.random() * 1500 + 500;
+  
+  // 根据消息长度添加额外时间
+  // 假设平均打字速度是每分钟200个字符，也就是每秒3.33个字符
+  const typingTime = (messageLength / 3.33) * 1000;
+  
+  // 添加一些随机变化，模拟思考和打字速度的不确定性
+  const randomVariation = Math.random() * 1000 - 500; // -500到500毫秒的随机变化
+  
+  return baseThinkingTime + typingTime + randomVariation;
+}
 
 export default function ChatScreen() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -57,15 +113,19 @@ export default function ChatScreen() {
     const { initialMessage, initialOptions, initialTopicId, initialSessionId } = route.params || {};
 
     if (initialMessage) {
-      setMessages([{ sender: 'ai', text: initialMessage }]); // 添加AI初始消息
+      setMessages([{ 
+        sender: 'ai', 
+        text: initialMessage, 
+        timestamp: new Date() // 为初始消息添加时间戳
+      }]);
     }
 
     if (initialOptions) {
-      setPredictedOptions(initialOptions); // 设置初始的选项
+      setPredictedOptions(initialOptions);
     }
 
     if (initialTopicId !== undefined) {
-      setTopicId(initialTopicId); // 设置 topic ID
+      setTopicId(initialTopicId);
     }
 
     if (initialSessionId) {
@@ -88,17 +148,40 @@ export default function ChatScreen() {
     }
 
     if (inputText.trim() !== '') {
-      const newMessages: Message[] = [...messages, { sender: 'user', text: inputText }];
+      // 发送消息时添加时间戳
+      const newMessages: Message[] = [...messages, { 
+        sender: 'user', 
+        text: inputText, 
+        delivered: false,
+        timestamp: new Date() // 添加当前时间
+      }];
       setMessages(newMessages);
       setInputText('');
-      setLoading(true);
 
-      scrollToBottom(); // 用户发送消息后立即滚动到底部
+      scrollToBottom();
 
       try {
         const response = await getAIResponse(semoUserId, inputText, topicId, sessionId);
-        const updatedMessages = [...newMessages, { sender: 'ai', text: response.content }];
+        
+        // 在收到响应后，更新最后一条用户消息的 delivered 状态
+        const updatedMessages = newMessages.map((msg, index) => 
+          index === newMessages.length - 1 ? { ...msg, delivered: true } : msg
+        );
         setMessages(updatedMessages);
+
+        // 设置 loading 状态为 true
+        setLoading(true);
+        
+        const humanLikeDelay = getHumanLikeDelay(response.content.length);
+        await new Promise(resolve => setTimeout(resolve, humanLikeDelay));
+
+        // 添加 AI 的响应消息，包含时间戳
+        const finalMessages = [...updatedMessages, { 
+          sender: 'ai' as const, // 使用 'as const' 来明确指定类型
+          text: response.content,
+          timestamp: new Date()
+        }];
+        setMessages(finalMessages);
         setEmotion(response.emotion);
         setPredictedOptions(response.predicted_options);
 
@@ -106,7 +189,6 @@ export default function ChatScreen() {
           setTopicId(response.topic_id);
         }
 
-        // 如果后端返回新的 sessionId，更新它
         if (response.session_id) {
           setSessionId(response.session_id);
         }
@@ -136,30 +218,52 @@ export default function ChatScreen() {
     return colors.primary;
   };
 
+  // 添加一个格式化时间的函数
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', hour12: false });
+  };
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 85 : 85} // 增加了 85 的额外高度
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 85 : 85}
     >
       <ScrollView
         style={styles.messagesContainer}
         ref={scrollViewRef}
-        onContentSizeChange={scrollToBottom} // 添加这一行以确保内容变化时也会滚动
+        onContentSizeChange={scrollToBottom}
       >
         {messages.map((msg, index) => (
-          <View
-            key={index}
-            style={[
-              msg.sender === 'user' ? styles.userMessageBubble : styles.aiMessageBubble,
-            ]}
-          >
-            <Text style={msg.sender === 'user' ? styles.userMessageText : styles.aiMessageText}>
-              {msg.text}
-            </Text>
+          <View key={index} style={[
+            styles.messageRow,
+            msg.sender === 'user' ? styles.userMessageRow : styles.aiMessageRow
+          ]}>
+            {msg.sender === 'user' ? (
+              <View style={styles.userMessageContainer}>
+                <View style={styles.userMessageInfo}>
+                  {msg.delivered && <Text style={styles.deliveredIcon}>✓</Text>}
+                  {msg.timestamp && (
+                    <Text style={styles.messageTime}>{formatTime(msg.timestamp)}</Text>
+                  )}
+                </View>
+                <View style={styles.userMessageBubble}>
+                  <Text style={styles.userMessageText}>{msg.text}</Text>
+                </View>
+              </View>
+            ) : (
+              <View style={styles.aiMessageContainer}>
+                <View style={styles.aiMessageBubble}>
+                  <Text style={styles.aiMessageText}>{msg.text}</Text>
+                </View>
+                {msg.timestamp && (
+                  <Text style={styles.aiMessageTime}>{formatTime(msg.timestamp)}</Text>
+                )}
+              </View>
+            )}
           </View>
         ))}
-        {loading && <ActivityIndicator size="large" color={colors.primary} style={styles.loadingIndicator} />}
+        {loading && <TypingIndicator />}
       </ScrollView>
 
       <View style={styles.bottomContainer}>
@@ -337,5 +441,85 @@ const styles = StyleSheet.create({
   sendIcon: {
     width: 24,
     height: 24,
+  },
+  typingIndicator: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    paddingLeft: 15,
+    marginTop: 5,
+    marginBottom: 10, // 添加底部边距
+  },
+  dot: {
+    width: 8, // 稍微增大点的大小
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: colors.gray400,
+    marginRight: 4, // 增加点之间的间距
+  },
+  messageRow: {
+    marginVertical: 5,
+    paddingHorizontal: 15,
+  },
+  userMessageRow: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+  },
+  aiMessageRow: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+  },
+  deliveredIcon: {
+    fontSize: 16,
+    color: colors.gray400,
+    marginBottom: 2,
+  },
+  userMessageContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    maxWidth: '80%',
+  },
+  aiMessageContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    maxWidth: '80%',
+  },
+  userMessageInfo: {
+    flexDirection: 'column',
+    alignItems: 'flex-end',
+    marginRight: 5,
+    justifyContent: 'flex-end',
+  },
+  userMessageBubble: {
+    backgroundColor: colors.primary,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 20,
+  },
+  aiMessageBubble: {
+    backgroundColor: colors.white,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 20,
+  },
+  userMessageText: {
+    fontSize: 17,
+    lineHeight: 20,
+    color: colors.white,
+  },
+  aiMessageText: {
+    fontSize: 17,
+    lineHeight: 20,
+    color: colors.gray600,
+  },
+  messageTime: {
+    fontSize: 12,
+    color: colors.gray400,
+  },
+  aiMessageTime: {
+    fontSize: 12,
+    color: colors.gray400,
+    marginLeft: 5,
+    alignSelf: 'flex-end',
   },
 });

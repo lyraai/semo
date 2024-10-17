@@ -17,7 +17,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.semo.ai",
-      "buildNumber": "7",
+      "buildNumber": "8",
       "config": {
         "entitlements": {
           "aps-environment": "development"
